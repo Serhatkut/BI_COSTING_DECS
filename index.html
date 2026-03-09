@@ -94,6 +94,12 @@
             gap: 15px;
         }
 
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
         .grid-outputs {
             display: grid;
             grid-template-columns: 350px 1fr;
@@ -370,12 +376,12 @@
             </div>
 
             <div style="font-size: 13px; margin-bottom: 20px;">
-                <b>Inclusions:</b> Integration, storage, compute/processing, BI tooling, governance tooling, support/ops
-                specific to data platforms.<br>
-                <b>Exclusions:</b> Operational source systems (ERP/CRM), business analyst headcount, one-off project
-                costs.<br>
+                <b>Inclusions (Tooling & Central FTEs):</b> Infrastructure, platform tools, and Centralized headcount
+                (e.g., Data Engineers, BI Developers, Platform Support FTEs).<br>
+                <b>Exclusions:</b> Operational source systems (ERP/CRM), distributed/local business analyst headcount,
+                and one-off project costs.<br>
                 <b>Translation Layer:</b> Enter costs directly in standardized EUR, or use "Vendor Units" to
-                auto-convert local metrics (like DBUs or GBs) into normalized EUR costs.
+                auto-convert local metrics into normalized EUR costs.
             </div>
 
             <div class="diagram" id="diagramContainer">
