@@ -9,12 +9,13 @@
         :root {
             --dhl-red: #D40511;
             --dhl-yellow: #FFCC00;
-            --text-dark: #333333;
-            --text-light: #666666;
+            --dhl-dark: #222222;
+            --text-dark: #222222;
+            --text-light: #555555;
             --bg-white: #FFFFFF;
-            --bg-light: #F8F8F8;
-            --border-grey: #DDDDDD;
-            --chart-colors: #003B5C, #00A6CE, #00875A, #6236FF, #FF7300, #E40046, #4C5D6C;
+            --bg-light: #F5F6F8;
+            --border-grey: #D5D5D5;
+            --chart-colors: #FFCC00, #D40511, #4A4A4A, #888888, #FFEB85, #990000, #222222;
         }
 
         body {
@@ -352,14 +353,19 @@
         <div class="card">
             <div class="card-header">
                 Methodology & Data Journey
-                <div style="font-size: 12px; font-weight: normal; color: var(--text-light);">
-                    <button class="btn btn-outline btn-small" onclick="loadExample('balanced')">Example: Balanced
-                        Stack</button>
-                    <button class="btn btn-outline btn-small" onclick="loadExample('processing')">Example: Processing
+                <div
+                    style="font-size: 12px; font-weight: normal; color: var(--text-light); display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; max-width: 65%;">
+                    <button class="btn btn-outline btn-small" onclick="loadExample('balanced')">Balanced</button>
+                    <button class="btn btn-outline btn-small" onclick="loadExample('processing')">Processing
                         Heavy</button>
-                    <button class="btn btn-outline btn-small" onclick="loadExample('license')">Example: License
-                        Waste</button>
-                    <button class="btn btn-outline btn-small" onclick="resetForm()">Reset All</button>
+                    <button class="btn btn-outline btn-small" onclick="loadExample('storage')">Data Lake</button>
+                    <button class="btn btn-outline btn-small" onclick="loadExample('license')">License Waste</button>
+                    <button class="btn btn-outline btn-small" onclick="loadExample('sprawl')">Sprawl</button>
+                    <button class="btn btn-outline btn-small" onclick="loadExample('elt')">ELT Migration</button>
+                    <button class="btn btn-outline btn-small" onclick="loadExample('optimized')"
+                        style="border-color: var(--dhl-red); border-width: 2px; color: var(--text-dark); background-color: var(--dhl-yellow); font-weight: bold;">Best
+                        Optimised</button>
+                    <button class="btn btn-outline btn-small" onclick="resetForm()">Reset</button>
                 </div>
             </div>
 
@@ -537,7 +543,7 @@
             { id: 'operations', label: 'G. Operations', icon: '🛠️', def: 'Platform support, infra running costs, orchestration.', owners: 'Platform', levers: ['Automate alerting', 'Right-size orchestrator instances'] }
         ];
 
-        const COLORS = ['#003B5C', '#00A6CE', '#00875A', '#6236FF', '#FF7300', '#E40046', '#4C5D6C'];
+        const COLORS = ['#FFCC00', '#D40511', '#4A4A4A', '#888888', '#FFEB85', '#990000', '#222222'];
 
         // --- Init & UI Generation ---
         function init() {
@@ -904,9 +910,13 @@
         // --- Scenarios & State Mgmt ---
         function loadExample(type) {
             resetForm(false);
+
+            // Default active driver bounds for most examples
             document.getElementById('inp_shipments').value = 5000000;
             document.getElementById('inp_users').value = 500;
             document.getElementById('inp_revenue').value = 25000000;
+            document.getElementById('inp_queries').value = 200000;
+            document.getElementById('inp_storageTB').value = 50;
 
             if (type === 'balanced') {
                 document.getElementById('eur_integration').value = 2000;
@@ -921,7 +931,7 @@
                 document.getElementById('inp_queries').value = 1500000;
                 document.getElementById('eur_integration').value = 3000;
                 document.getElementById('eur_storage').value = 6000;
-                document.getElementById('eur_processing').value = 28000;
+                document.getElementById('eur_processing').value = 35000;
                 document.getElementById('eur_analytics').value = 4000;
                 document.getElementById('eur_consumption').value = 1000;
                 document.getElementById('eur_governance').value = 500;
@@ -940,6 +950,46 @@
                 document.getElementById('eur_consumption').value = 1000;
                 document.getElementById('eur_governance').value = 1000;
                 document.getElementById('eur_operations').value = 1500;
+            }
+            else if (type === 'storage') {
+                document.getElementById('inp_storageTB').value = 5000; // Huge data lake
+                document.getElementById('eur_integration').value = 4000;
+                document.getElementById('eur_storage').value = 45000;
+                document.getElementById('eur_processing').value = 3000;
+                document.getElementById('eur_analytics').value = 2000;
+                document.getElementById('eur_consumption').value = 500;
+                document.getElementById('eur_governance').value = 1000;
+                document.getElementById('eur_operations').value = 3000;
+            }
+            else if (type === 'sprawl') {
+                document.getElementById('inp_users').value = 1500;
+                document.getElementById('eur_integration').value = 5000;
+                document.getElementById('eur_storage').value = 8000;
+                document.getElementById('eur_processing').value = 22000;
+                document.getElementById('eur_analytics').value = 35000;
+                document.getElementById('eur_consumption').value = 5000;
+                document.getElementById('eur_governance').value = 2000;
+                document.getElementById('eur_operations').value = 30000; // Shadow IT / Sprawl operations
+            }
+            else if (type === 'elt') {
+                document.getElementById('eur_integration').value = 18000; // High integration syncs
+                document.getElementById('eur_storage').value = 5000;
+                document.getElementById('eur_processing').value = 25000; // Heavy dbt/SQL overlap
+                document.getElementById('eur_analytics').value = 4000;
+                document.getElementById('eur_consumption').value = 1500;
+                document.getElementById('eur_governance').value = 500;
+                document.getElementById('eur_operations').value = 8000;
+            }
+            else if (type === 'optimized') {
+                document.getElementById('inp_queries').value = 5000; // Highly cached, low ad-hoc querying
+                document.getElementById('inp_users').value = 800; // Great adoption
+                document.getElementById('eur_integration').value = 1000;
+                document.getElementById('eur_storage').value = 1200;
+                document.getElementById('eur_processing').value = 1500;
+                document.getElementById('eur_analytics').value = 3000; // Right-sized licenses
+                document.getElementById('eur_consumption').value = 500;
+                document.getElementById('eur_governance').value = 800; // Automated DQ
+                document.getElementById('eur_operations').value = 1200; // Serverless
             }
             calc();
         }

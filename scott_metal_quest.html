@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scott's Heavy Metal Quest</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            color: #fff;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 30px #ff0000;
+            border: 4px solid #333;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        h1 {
+            color: #ff0000;
+            text-shadow: 3px 3px 0 #000, -1px -1px 0 #fff, 0 0 15px #ff0000;
+            margin-bottom: 5px;
+            font-size: 40px;
+            letter-spacing: 3px;
+        }
+
+        p.subtitle {
+            color: #ccc;
+            font-size: 16px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px #000;
+        }
+
+        #ui {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffcc00;
+            text-shadow: 2px 2px #000;
+            pointer-events: none;
+        }
+
+        #game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        #game-over h2 {
+            font-size: 50px;
+            color: #ff0000;
+            margin: 0 0 20px 0;
+            text-shadow: 0 0 20px #ff0000;
+        }
+
+        button {
+            background-color: #cc0000;
+            color: #fff;
+            border: 3px solid #ff0000;
+            padding: 15px 35px;
+            font-size: 26px;
+            font-family: 'Impact', sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px #ff0000;
+        }
+
+        button:hover {
+            background-color: #ff0000;
+            transform: scale(1.1);
+            box-shadow: 0 0 30px #ff0000;
+        }
+
+        .controls {
+            margin-top: 20px;
+            color: #777;
+            font-size: 14px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .controls strong {
+            color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Scott's Metal Quest</h1>
+    <p class="subtitle">Beat the weak, collect the drumsticks!</p>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        <div id="ui">
+            <span id="scoreDisplay">Score: 0</span>
+            <span id="healthDisplay">Health: \m/ \m/ \m/</span>
+        </div>
+        <div id="game-over">
+            <h2>Mosh Pit Eviction!</h2>
+            <p id="finalScore" style="font-size: 28px; margin-bottom: 30px; color: #fff; text-shadow: 2px 2px #000;">
+                Final Score: 0</p>
+            <button id="restartBtn">Play Again \\m/</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <strong>[SPACE]</strong> or <strong>[UP]</strong> to Jump | <strong>Double Jump</strong> for a Blast Beat!
+    </div>
+
+    <!-- Hidden Audio Player -->
+    <audio id="bgMusic" loop>
+        <source src="heavy_metal_track.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const healthDisplay = document.getElementById('healthDisplay');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Game state
+        let gameLoop;
+        let frame = 0;
+        let score = 0;
+        let gameSpeed = 6;
+        let isGameOver = false;
+        let hasStartedMusic = false;
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.5; // 50% volume so sound effects stand out
+
+        // Entities
+        const player = {
+            x: 100,
+            y: 300,
+            w: 40,
+            h: 60,
+            dy: 0,
+            gravity: 0.7,
+            jumpForce: -13,
+            grounded: false,
+            health: 3,
+            doubleJump: true,
+            flashTimer: 0
+        };
+
+        let obstacles = [];
+        let particles = [];
+
+        // Background stars/sparks (embers of a concert pyrotechnics)
+        let sparks = [];
+        for (let i = 0; i < 60; i++) {
+            sparks.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2.5 + 0.5,
+                speed: Math.random() * 3 + 1
+            });
+        }
+
+        // Input handling
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.code === 'ArrowUp') && !isGameOver) {
+                e.preventDefault(); // Prevent scrolling
+
+                // Modern browsers block autoplay until user interacts. Start music on first jump!
+                if (!hasStartedMusic) {
+                    bgMusic.play().catch(err => console.log('Audio playback requires interaction.'));
+                    hasStartedMusic = true;
+                }
+
+                Jump();
+            }
+        });
+
+        restartBtn.addEventListener('click', initGame);
+
+        function Jump() {
+            if (player.grounded) {
+                player.dy = player.jumpForce;
+                player.grounded = false;
+                player.doubleJump = true;
+                createParticles(player.x + player.w / 2, player.y + player.h, 15, '#aaaaaa');
+            } else if (player.doubleJump) {
+                // Blast beat double jump!
+                player.dy = player.jumpForce * 0.8;
+                player.doubleJump = false;
+                createParticles(player.x + player.w / 2, player.y + player.h, 30, '#ff0000'); // Fiery rockout
+                createParticles(player.x + player.w / 2, player.y + player.h, 20, '#ff9900');
+
+                // Push away any enemies right beneath
+                obstacles.forEach(obs => {
+                    if (obs.type === 'enemy' && obs.x > player.x - 50 && obs.x < player.x + 200) {
+                        obs.type = 'destroyed';
+                        score += 20;
+                        createParticles(obs.x + obs.w / 2, obs.y + obs.h / 2, 20, '#555555');
+                    }
+                });
+            }
+        }
+
+        function createParticles(x, y, count, color) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12,
+                    life: 1,
+                    decay: Math.random() * 0.05 + 0.02,
+                    color: color || ['#ff0000', '#ff5500', '#ffcc00'][Math.floor(Math.random() * 3)]
+                });
+            }
+        }
+
+        class Obstacle {
+            constructor() {
+                // Drumstick or Enemy
+                this.type = Math.random() > 0.35 ? 'enemy' : 'drumstick';
+
+                // Make an amp or flying skull
+                this.enemyStyle = Math.random() > 0.5 ? 'amp' : 'skull';
+
+                this.w = this.type === 'enemy' ? (this.enemyStyle === 'amp' ? 40 : 30) : 30;
+                this.h = this.type === 'enemy' ? (this.enemyStyle === 'amp' ? 50 : 30) : 30;
+                this.x = canvas.width;
+
+                // Drumsticks and skulls can be in the air
+                if (this.type === 'drumstick' || (this.type === 'enemy' && this.enemyStyle === 'skull')) {
+                    this.y = 340 - this.h - (Math.random() * 140 + 20);
+                } else {
+                    this.y = 340 - this.h; // Amps sit on ground
+                }
+
+                this.passed = false;
+            }
+
+            update() {
+                this.x -= gameSpeed;
+                if (this.type === 'enemy' && this.enemyStyle === 'skull') {
+                    // Skulls float up and down slightly
+                    this.y += Math.sin(frame * 0.1) * 2;
+                }
+                if (this.type === 'drumstick') {
+                    // Spinning effect for logic if needed, handled in draw
+                }
+            }
+
+            draw() {
+                if (this.type === 'destroyed') return; // Skip drawing
+
+                if (this.type === 'enemy') {
+                    if (this.enemyStyle === 'amp') {
+                        // Draw a dark amp stack
+                        ctx.fillStyle = '#222';
+                        ctx.fillRect(this.x, this.y, this.w, this.h);
+                        ctx.fillStyle = '#111';
+                        ctx.fillRect(this.x + 5, this.y + 5, this.w - 10, this.h / 2 - 5);
+                        ctx.fillRect(this.x + 5, this.y + this.h / 2 + 5, this.w - 10, this.h / 2 - 10);
+                        // Speaker cones
+                        ctx.fillStyle = '#550000';
+                        ctx.beginPath();
+                        ctx.arc(this.x + this.w / 2, this.y + this.h / 4 + 2, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(this.x + this.w / 2, this.y + this.h * 0.75, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        // Draw a floating enemy skull
+                        ctx.fillStyle = '#999';
+                        ctx.beginPath();
+                        ctx.arc(this.x + this.w / 2, this.y + 15, 12, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillRect(this.x + this.w / 2 - 6, this.y + 15, 12, 10);
+                        // Evil Red Eyes
+                        ctx.fillStyle = '#ff0000';
+                        ctx.beginPath();
+                        ctx.arc(this.x + this.w / 2 - 5, this.y + 12, 3, 0, Math.PI * 2);
+                        ctx.arc(this.x + this.w / 2 + 5, this.y + 12, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (this.type === 'drumstick') {
+                    // Draw a wooden drumstick
+                    ctx.save();
+                    ctx.translate(this.x + this.w / 2, this.y + this.h / 2);
+                    // Rotate to make it look dynamic
+                    ctx.rotate((frame * 0.05) % (Math.PI * 2));
+
+                    // Stick body
+                    ctx.fillStyle = '#deb887'; // light wood
+                    ctx.beginPath();
+                    // We use standard methods instead of roundRect for compatibility
+                    ctx.moveTo(-15, -3);
+                    ctx.lineTo(15, -3);
+                    ctx.lineTo(15, 3);
+                    ctx.lineTo(-15, 3);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Tip
+                    ctx.fillStyle = '#d2b48c';
+                    ctx.beginPath();
+                    ctx.arc(15, 0, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+            }
+        }
+
+        function spawnObstacles() {
+            let spawnRate = Math.max(40, 100 - gameSpeed * 3); // Faster spawns over time
+            if (frame % Math.floor(spawnRate) === 0) {
+                obstacles.push(new Obstacle());
+            }
+        }
+
+        function update() {
+            if (isGameOver) return;
+
+            frame++;
+            gameSpeed = 6 + Math.floor(score / 400); // progressive speed
+
+            // Player physics
+            player.dy += player.gravity;
+            player.y += player.dy;
+
+            // Ground collision (Ground is at y=340)
+            if (player.y + player.h >= 340) {
+                player.y = 340 - player.h;
+                player.dy = 0;
+                player.grounded = true;
+                player.doubleJump = true; // reset double jump if landed
+            } else {
+                player.grounded = false;
+            }
+
+            // Update flash timer
+            if (player.flashTimer > 0) player.flashTimer--;
+
+            // Update sparks
+            sparks.forEach(s => {
+                s.x -= s.speed + (gameSpeed * 0.15);
+                if (s.x < 0) {
+                    s.x = canvas.width;
+                    s.y = Math.random() * canvas.height;
+                }
+            });
+
+            // Obstacles
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.update();
+
+                // Collision detection (only if not destroyed and not flashing)
+                if (obs.type !== 'destroyed' && player.flashTimer <= 0) {
+                    // A bit of leniency on hitboxes
+                    const hitMargin = 5;
+                    if (
+                        player.x + hitMargin < obs.x + obs.w &&
+                        player.x + player.w - hitMargin > obs.x &&
+                        player.y + hitMargin < obs.y + obs.h &&
+                        player.y + player.h - hitMargin > obs.y
+                    ) {
+                        // Hit!
+                        if (obs.type === 'enemy') {
+                            player.health--;
+                            updateHealthDisplay();
+                            createParticles(player.x + player.w / 2, player.y + player.h / 2, 40, '#ff0000');
+                            player.flashTimer = 60; // 1 second invulnerability
+
+                            if (player.health <= 0) {
+                                endGame();
+                            } else {
+                                score = Math.max(0, score - 50);
+                            }
+                        } else if (obs.type === 'drumstick') {
+                            // Collect drumstick
+                            score += 50;
+                            createParticles(obs.x + obs.w / 2, obs.y + obs.h / 2, 15, '#ffff00');
+                            obstacles.splice(i, 1);
+                            continue;
+                        }
+                    }
+                }
+
+                // Score for passing enemies
+                if (obs.type === 'enemy' && !obs.passed && player.x > obs.x + obs.w) {
+                    score += 10;
+                    obs.passed = true;
+                }
+
+                // Remove off-screen
+                if (obs.x + obs.w < 0 || obs.type === 'destroyed') {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Auto score
+            if (frame % 5 === 0) score++;
+            scoreDisplay.innerText = `Score: ${score}`;
+
+            spawnObstacles();
+        }
+
+        function drawPlayer() {
+            if (player.flashTimer > 0 && Math.floor(frame / 5) % 2 === 0) {
+                return; // Flicker effect when hit
+            }
+
+            // Scott!
+            ctx.fillStyle = '#ffe0bd'; // skin tone
+            // Head
+            ctx.beginPath();
+            ctx.arc(player.x + player.w / 2, player.y + 15, 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Long Metal Hair
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.w / 2 - 18, player.y + 25);
+            ctx.lineTo(player.x + player.w / 2 - 5, player.y - 2);
+            ctx.lineTo(player.x + player.w / 2 + 20, player.y + 10); // blowing back
+            ctx.lineTo(player.x + player.w / 2 + 5, player.y + 25);
+            ctx.fill();
+
+            // Eye gear / shades
+            ctx.fillStyle = '#000';
+            ctx.fillRect(player.x + player.w / 2 + 2, player.y + 10, 10, 4);
+
+            // Body (Black band tee)
+            ctx.fillStyle = '#222';
+            ctx.fillRect(player.x + 8, player.y + 25, 24, 25);
+
+            // Drumsticks in hands
+            ctx.save();
+            ctx.fillStyle = '#deb887'; // wooden stick color
+
+            // Right arm/stick (back)
+            ctx.save();
+            ctx.translate(player.x + 25, player.y + 40);
+            let rightArmRotation = Math.sin(frame * 0.5) * 0.5;
+            if (!player.grounded) rightArmRotation = -Math.PI / 4; // Hands up when jumping
+            ctx.rotate(rightArmRotation - Math.PI / 6);
+            ctx.fillRect(0, -2, 20, 3);
+            ctx.beginPath(); ctx.arc(20, -0.5, 2.5, 0, Math.PI * 2); ctx.fill(); // Tip
+            ctx.restore();
+
+            // Left arm/stick (front)
+            ctx.save();
+            ctx.translate(player.x + 15, player.y + 40);
+            let leftArmRotation = Math.sin(frame * 0.5 + Math.PI) * 0.5;
+            if (!player.grounded) leftArmRotation = Math.PI / 4;
+            ctx.rotate(leftArmRotation - Math.PI / 4);
+            ctx.fillRect(0, -2, 20, 3);
+            ctx.beginPath(); ctx.arc(20, -0.5, 2.5, 0, Math.PI * 2); ctx.fill(); // Tip
+            ctx.restore();
+
+            ctx.restore();
+
+            // Legs (Dark Denim)
+            ctx.fillStyle = '#2c3e50';
+
+            // Running animation
+            let legOffset = Math.sin(frame * 0.3) * 12;
+            if (!player.grounded) legOffset = 0; // Frozen legs in air
+
+            ctx.fillRect(player.x + 10 + legOffset / 2, player.y + 50, 10, 10);
+            ctx.fillRect(player.x + 20 - legOffset / 2, player.y + 50, 10, 10);
+        }
+
+        function draw() {
+            // Clear sky/bg
+            ctx.fillStyle = '#0d0000'; // Very dark crimson tint
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw background sparks (pyrotechnics)
+            sparks.forEach(s => {
+                ctx.fillStyle = '#ff3300';
+                ctx.globalAlpha = 0.6 + Math.random() * 0.4; // Flicker
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1.0;
+
+            // Ground base
+            ctx.fillStyle = '#330000'; // dark red dirt
+            ctx.fillRect(0, 340, canvas.width, 60);
+
+            // Ground stage/details (scrolling)
+            ctx.fillStyle = '#1a0000';
+            for (let i = 0; i < 25; i++) {
+                let offset = (frame * gameSpeed) % 40;
+                ctx.fillRect((i * 40) - offset, 340, 20, 15);
+            }
+
+            // Lighting edge
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(0, 340, canvas.width, 3);
+
+            // Draw entities
+            obstacles.forEach(o => o.draw());
+
+            // Draw Player
+            drawPlayer();
+
+            // Particles
+            particles.forEach(p => {
+                ctx.globalAlpha = p.life < 0 ? 0 : p.life;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                // fiery triangle shape
+                ctx.moveTo(p.x, p.y - 4);
+                ctx.lineTo(p.x + 3, p.y + 2);
+                ctx.lineTo(p.x - 3, p.y + 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        function updateHealthDisplay() {
+            let hStr = '';
+            for (let i = 0; i < player.health; i++) {
+                hStr += '\\m/ '; // Rock on horns symbol
+            }
+            healthDisplay.innerText = `Health: ${hStr}`;
+        }
+
+        function endGame() {
+            isGameOver = true;
+            gameOverScreen.style.display = 'flex';
+            finalScoreDisplay.innerText = `Final Score: ${score}\nYou survived ${Math.floor(frame / 60)} seconds in the pit!`;
+        }
+
+        function initGame() {
+            player.y = 300;
+            player.dy = 0;
+            player.health = 3;
+            player.flashTimer = 0;
+            score = 0;
+            frame = 0;
+            gameSpeed = 6;
+            obstacles = [];
+            particles = [];
+            isGameOver = false;
+
+            gameOverScreen.style.display = 'none';
+            updateHealthDisplay();
+
+            if (!gameLoop) loop();
+        }
+
+        function loop() {
+            update();
+            draw();
+            if (!isGameOver) {
+                requestAnimationFrame(loop);
+            } else {
+                gameLoop = null; // stops the loop completely
+            }
+        }
+
+        // Start
+        initGame();
+        gameLoop = requestAnimationFrame(loop);
+
+    </script>
+</body>
+
+</html>
