@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Comparable BI Cost Framework</title>
+    <style>
+        :root {
+            --dhl-red: #D40511;
+            --dhl-yellow: #FFCC00;
+            --dhl-dark: #222222;
+            --text-dark: #222222;
+            --text-light: #555555;
+            --bg-white: #FFFFFF;
+            --bg-light: #F5F6F8;
+            --border-grey: #D5D5D5;
+            --chart-colors: #FFCC00, #D40511, #4A4A4A, #888888, #FFEB85, #990000, #222222;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        header {
+            background: var(--bg-white);
+            border-top: 4px solid var(--dhl-red);
+            padding: 20px 40px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        p {
+            margin: 0 0 15px 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-grey);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .grid-5 {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+        }
+
+        .grid-6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .grid-6 {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .grid-outputs {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: var(--dhl-yellow);
+            color: var(--text-dark);
+            border: 1px solid #E5B800;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 2px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #E5B800;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-grey);
+            color: var(--text-dark);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-light);
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: var(--text-light);
+        }
+
+        input[type="number"],
+        input[type="text"],
+        input[type="month"],
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-grey);
+            border-radius: 2px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input[readonly] {
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-grey);
+        }
+
+        th {
+            background: var(--bg-light);
+            font-weight: bold;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .kpi-box {
+            background: var(--bg-light);
+            border: 1px solid var(--border-grey);
+            border-left: 4px solid var(--dhl-yellow);
+            padding: 15px;
+            text-align: center;
+        }
+
+        .kpi-title {
+            font-size: 12px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: var(--text-dark);
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .step-row {
+            background: var(--bg-light);
+            border: 1px solid var(--border-grey);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 2px;
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .mode2-inputs {
+            display: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-grey);
+        }
+
+        .mode2-inputs.active {
+            display: block;
+        }
+
+        canvas {
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .diagram {
+            display: flex;
+            justify-content: space-between;
+            background: var(--bg-white);
+            padding: 20px;
+            border: 1px solid var(--border-grey);
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .diagram-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            padding: 10px;
+            min-width: 100px;
+            border-right: 1px solid var(--border-grey);
+            cursor: pointer;
+        }
+
+        .diagram-step:last-child {
+            border-right: none;
+        }
+
+        .diagram-step:hover {
+            background: var(--bg-light);
+        }
+
+        .diagram-step.active {
+            border-bottom: 4px solid var(--dhl-red);
+            background: var(--bg-light);
+        }
+
+        .diagram-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .diagram-label {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .step-detail {
+            background: var(--bg-light);
+            padding: 15px;
+            border: 1px solid var(--border-grey);
+            margin-top: -1px;
+            display: none;
+        }
+
+        .step-detail.active {
+            display: block;
+        }
+
+        .alert {
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            border-radius: 2px;
+            font-size: 14px;
+        }
+
+        .alert-warning {
+            background: #FFF3CD;
+            border: 1px solid #FFEEBA;
+            color: #856404;
+            border-left: 4px solid var(--dhl-yellow);
+        }
+
+        .alert-danger {
+            background: #F8D7DA;
+            border: 1px solid #F5C6CB;
+            color: #721C24;
+            border-left: 4px solid var(--dhl-red);
+        }
+
+        .score-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: var(--dhl-yellow);
+            font-weight: bold;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .lever-list {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 13px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-grey);
+            padding: 0 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            outline: none;
+            transition: color 0.2s, border-bottom 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-dark);
+        }
+
+        .tab-btn.active {
+            color: var(--text-dark);
+            border-bottom: 3px solid var(--dhl-red);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Wizard Styles */
+        .wizard-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 0 10px;
+        }
+
+        .wizard-step-marker {
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-light);
+            padding: 10px;
+            border-bottom: 3px solid var(--border-grey);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step-marker.active {
+            color: var(--dhl-red);
+            border-bottom-color: var(--dhl-red);
+        }
+
+        .wizard-step-marker.completed {
+            color: #00875A;
+            /* Green check */
+            border-bottom-color: #00875A;
+        }
+
+        .wizard-step {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        .wizard-step.active {
+            display: block;
+        }
+
+        .wizard-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-grey);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+            <h1>Global Comparable BI Cost Framework</h1>
+            <p style="color: var(--text-light); margin: 0; font-size: 14px;">Establish a consistent methodology to
+                analyze
+                and optimize end-to-end data processing and analytics costs.</p>
+        </div>
+        <div>
+            <label for="countrySelector" style="font-weight: bold; font-size: 14px; margin-right: 10px;">Active
+                Context:</label>
+            <select id="countrySelector" onchange="switchCountry(this.value)"
+                style="padding: 8px 12px; font-size: 16px; border-radius: 4px; border: 1px solid var(--border-grey); background-color: var(--bg-light); cursor: pointer; min-width: 200px;">
+                <option value="Global">🌍 Global Aggregation</option>
+                <option disabled>──────────</option>
+                <!-- Injected via JS -->
+            </select>
+        </div>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" id="btn-tab-dashboard" onclick="switchTab('tab-dashboard')">Dashboard
+            Insights</button>
+        <button class="tab-btn" id="btn-tab-data" onclick="switchTab('tab-data')">Data Entry & Architecture</button>
+    </div>
+
+    <div class="container">
+
+        <div id="tab-dashboard" class="tab-content active">
+            <!-- Global / Country Dashboard Content -->
+
+            <div class="card" id="dashboard_kpi_card">
+                <div class="card-header" id="dashboard_kpi_title">Key Performance Indicators</div>
+                <div class="grid-6" id="kpi_container" style="margin-bottom: 20px;">
+                    <!-- Filled dynamically by JS (Global or single Country) -->
+                </div>
+            </div>
+
+            <!-- Global Charts (Only visible when Global is active) -->
+            <div class="card" id="dashboard_global_charts" style="display: none;">
+                <div class="card-header">Country Comparisons</div>
+                <div class="grid-2">
+                    <div>
+                        <h4 style="font-size: 14px; text-align: center;">Total BI Cost by Country (EUR)</h4>
+                        <canvas id="globalBarChart" width="300" height="250"></canvas>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 14px; text-align: center;">Cost / Shipment by Country (EUR)</h4>
+                        <canvas id="globalCpsChart" width="300" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Country Charts (Only visible when a Country is active) -->
+            <div class="card" id="dashboard_country_charts">
+                <div class="card-header">
+                    Data Quality & Comparability
+                    <span class="score-badge" id="out_score">Score: 0/5</span>
+                </div>
+                <p style="font-size: 13px;" id="out_score_text"></p>
+                <div id="alerts_container"></div>
+                <hr style="border:0; border-top:1px solid var(--border-grey); margin: 20px 0;">
+                <div class="grid-2">
+                    <div>
+                        <h4 style="font-size: 14px; text-align: center;">Cost Distribution (EUR & %)</h4>
+                        <canvas id="stackChart" width="300" height="250"></canvas>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 14px; text-align: center;">Cost per Shipment by Step (EUR)</h4>
+                        <canvas id="barChart" width="300" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Monthly KPI Trends</div>
+                <div class="grid-2">
+                    <div>
+                        <h4 style="font-size: 14px; text-align: center;">Total BI Cost Evolution (EUR)</h4>
+                        <canvas id="trendChartTotal" width="600" height="250"></canvas>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 14px; text-align: center;">Cost per Shipment Evolution (EUR)</h4>
+                        <canvas id="trendChartShipment" width="600" height="250"></canvas>
+                    </div>
+                </div>
+                <div style="margin-top:20px;">
+                    <h4 style="font-size: 14px; text-align: center;">Data Added per Shipment (GB)</h4>
+                    <canvas id="trendChartDataShipment" width="1200" height="250"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="tab-data" class="tab-content">
+
+            <div class="wizard-progress" id="wizard_progress">
+                <div class="wizard-step-marker active" id="marker_1">1. Setup & Methodology</div>
+                <div class="wizard-step-marker" id="marker_2">2. Business Drivers</div>
+                <div class="wizard-step-marker" id="marker_3">3. Component Costs</div>
+                <div class="wizard-step-marker" id="marker_4">4. Historical Trends</div>
+                <div class="wizard-step-marker" id="marker_5">5. Review & Output</div>
+            </div>
+
+            <div class="wizard-step active" id="wiz_step_1">
+                <div class="card">
+                    <div class="card-header">
+                        Methodology & Data Journey
+                        <div
+                            style="font-size: 12px; font-weight: normal; color: var(--text-light); display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; max-width: 65%;">
+                            <button class="btn btn-outline btn-small"
+                                onclick="loadExample('balanced')">Balanced</button>
+                            <button class="btn btn-outline btn-small" onclick="loadExample('processing')">Processing
+                                Heavy</button>
+                            <button class="btn btn-outline btn-small" onclick="loadExample('storage')">Data
+                                Lake</button>
+                            <button class="btn btn-outline btn-small" onclick="loadExample('license')">License
+                                Waste</button>
+                            <button class="btn btn-outline btn-small" onclick="loadExample('sprawl')">Sprawl</button>
+                            <button class="btn btn-outline btn-small" onclick="loadExample('elt')">ELT
+                                Migration</button>
+                            <button class="btn btn-outline btn-small" onclick="loadExample('optimized')"
+                                style="border-color: var(--dhl-red); border-width: 2px; color: var(--text-dark); background-color: var(--dhl-yellow); font-weight: bold;">Best
+                                Optimised</button>
+                            <button class="btn btn-outline btn-small" onclick="resetForm()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 13px; margin-bottom: 20px;">
+                        <b>Inclusions (Tooling & Central FTEs):</b> Infrastructure, platform tools, and Centralized
+                        headcount
+                        (e.g., Data Engineers, BI Developers, Platform Support FTEs).<br>
+                        <b>Exclusions:</b> Operational source systems (ERP/CRM), distributed/local business analyst
+                        headcount,
+                        and one-off project costs.<br>
+                        <b>Translation Layer:</b> Enter costs directly in standardized EUR, or use "Vendor Units" to
+                        auto-convert local metrics into normalized EUR costs.
+                    </div>
+
+                    <div class="diagram" id="diagramContainer">
+                        <!-- Generated via JS -->
+                    </div>
+                    <div class="step-detail" id="stepDetailContainer"></div>
+                </div>
+            </div>
+
+            <div class="wizard-step" id="wiz_step_2">
+                <div class="grid-outputs">
+                    <div class="inputs-panel" style="width:100%;">
+
+                        <div class="card">
+                            <div class="card-header">1. Global Dimensions</div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Country</label>
+                                    <input type="text" id="inp_country" value="Germany" readonly
+                                        style="background-color: var(--bg-light); color: var(--text-light);">
+                                </div>
+                                <div class="form-group">
+                                    <label>Period</label>
+                                    <input type="month" id="inp_month" value="2023-10" onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Currency</label>
+                                    <select id="inp_currency" onchange="toggleFx(); calc()">
+                                        <option value="EUR">EUR</option>
+                                        <option value="USD">USD</option>
+                                        <option value="GBP">GBP</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>FX to EUR</label>
+                                    <input type="number" id="inp_fx" value="1.0" step="0.01" readonly onchange="calc()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">2. Business Drivers</div>
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Monthly Shipments (#)</label>
+                                    <input type="number" id="inp_shipments" value="" placeholder="e.g. 500000"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Total Shipments (Annual/YTD)</label>
+                                    <input type="number" id="inp_total_shipments" value="" placeholder="e.g. 6000000"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Active BI Users (#)</label>
+                                    <input type="number" id="inp_users" value="" placeholder="e.g. 500"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Revenue (User Currency)</label>
+                                    <input type="number" id="inp_revenue" value="" placeholder="e.g. 20000000"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Total IT Cost (Local Currency)</label>
+                                    <input type="number" id="inp_it_cost" value="" placeholder="e.g. 5000000"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Queries Processed (#)</label>
+                                    <input type="number" id="inp_queries" value="" placeholder="Optional"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Monthly Data Added (GB)</label>
+                                    <input type="number" id="inp_data_added" value="" placeholder="e.g. 500"
+                                        onchange="calc()">
+                                </div>
+                                <div class="form-group">
+                                    <label>Total Data Size (TB)</label>
+                                    <input type="number" id="inp_total_data" value="" placeholder="e.g. 50"
+                                        onchange="calc()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-step" id="wiz_step_3">
+                    <div class="grid-outputs">
+                        <div class="inputs-panel" style="width:100%;">
+                            <div class="card">
+                                <div class="card-header">3. Step Costs (Entered in EUR)</div>
+                                <div id="stepInputsContainer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-step" id="wiz_step_4">
+                    <div class="card">
+                        <div class="card-header">24-Month Data Grid</div>
+                        <div style="overflow-x: auto;">
+                            <table id="trend_grid" style="white-space: nowrap;">
+                                <thead>
+                                    <tr id="trend_grid_head">
+                                        <!-- Generated via JS -->
+                                    </tr>
+                                </thead>
+                                <tbody id="trend_grid_body">
+                                    <!-- Generated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-step" id="wiz_step_5">
+                    <div class="outputs-panel" style="width:100%;">
+
+                        <div class="card">
+                            <div class="card-header">Cost Breakdown</div>
+                            <div style="overflow-x: auto;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Step</th>
+                                            <th class="text-right">Total Cost (EUR)</th>
+                                            <th class="text-right">% Share</th>
+                                            <th class="text-right">Cost/Shipment</th>
+                                            <th class="text-right">Cost/User</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbl_body"></tbody>
+                                    <tfoot>
+                                        <tr style="font-weight: bold; background: var(--bg-light);">
+                                            <td>Total</td>
+                                            <td class="text-right" id="tbl_tot_eur">€0</td>
+                                            <td class="text-right">100%</td>
+                                            <td class="text-right" id="tbl_tot_ship">€0.0000</td>
+                                            <td class="text-right" id="tbl_tot_user">€0.00</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">24-Month Data Grid</div>
+                    <div style="overflow-x: auto;">
+                        <table id="trend_grid" style="white-space: nowrap;">
+                            <thead>
+                                <tr id="trend_grid_head">
+                                    <!-- Generated via JS -->
+                                </tr>
+                            </thead>
+                            <tbody id="trend_grid_body">
+                                <!-- Generated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" id="optimization_panel" style="display:none;">
+                    <div class="card-header">Optimization Opportunity</div>
+                    <div id="optimization_content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wizard Footer Navigation -->
+        <div class="wizard-footer">
+            <button class="btn btn-outline" id="btn_wiz_back" onclick="navigateWizard(-1)" style="display:none;">←
+                Back</button>
+            <div style="flex:1;"></div>
+            <button class="btn" id="btn_wiz_next" onclick="navigateWizard(1)">Next Step →</button>
+        </div>
+
+    </div>
+
+    </div>
+
+    <script>
+        let currentWizardStep = 1;
+
+        // --- Data Definitions ---
+        const STEPS = [
+            { id: 'integration', label: 'A. Integration', icon: '🔄', def: 'Moving data from source systems (ERP, CRM) to the analytical platform. Includes ETL/ELT pipeline tools, API connectors, message queues, and related data ingestion costs.', owners: 'Data Eng', levers: ['Incremental loads', 'Switch to ELT', 'Optimize connector schedules'] },
+            { id: 'storage', label: 'B. Storage', icon: '🗄️', def: 'Persisting data in operational data stores, data lakes, or analytical databases. Covers cost of raw storage footprints, backups, and cross-region replication.', owners: 'Cloud Ops', levers: ['Data lifecycle policies', 'Cold storage tiering', 'Compressions formats (Parquet)'] },
+            { id: 'processing', label: 'C. Processing', icon: '⚙️', def: 'The compute power required for transforming, modeling, validating, and joining data (e.g., dbt, Spark clusters, Snowflake warehouses). Often the biggest cost driver. Includes Data Engineering FTEs.', owners: 'Data Eng', levers: ['Materialized views', 'Right-size warehouse compute', 'Job optimization & indexing', 'Cache frequent queries'] },
+            { id: 'analytics', label: 'D. Analytics & Consumption', icon: '📊🌐', def: 'Frontend BI platforms (PowerBI, Tableau), custom portals, and embedded analytics. **Includes BI Developer FTEs responsible for centralized dashboard generation.**', owners: 'BI & Product', levers: ['Reclaim inactive licenses', 'Consolidate redundant dashboards', 'Use view-only tiers', 'Cache reports'] },
+            { id: 'governance', label: 'E. Governance', icon: '🛡️', def: 'Ensuring data is safe, compliant, and trustworthy. Includes data quality tooling, cataloging/lineage tools, security (Access Control, Data Loss Prevention), auditing, and compliance management.', owners: 'Data Gov & Sec', levers: ['Automate QA checks', 'Consolidate catalog tools', 'Standardize RBAC'] },
+            { id: 'operations', label: 'F. Operations', icon: '🛠️', def: 'Keeping the platform running smoothly. Covers orchestration tools (Airflow), cross-platform monitoring/alerting, and general infrastructure overhead. **Includes Platform Support & Monitoring FTEs.**', owners: 'Platform', levers: ['Automate alerting', 'Right-size orchestrator instances', 'Implement FinOps tags'] }
+        ];
+
+        const COLORS = ['#FFCC00', '#D40511', '#4A4A4A', '#888888', '#FFEB85', '#990000', '#222222'];
+
+        const GRID_ROWS = [
+            { id: 'shipments', label: 'Monthly Shipments', type: 'driver' },
+            { id: 'total_shipments', label: 'Total Shipments', type: 'driver' },
+            { id: 'users', label: 'Active Users', type: 'driver' },
+            { id: 'revenue', label: 'Revenue', type: 'driver' },
+            { id: 'it_cost', label: 'Total IT Cost', type: 'driver' },
+            { id: 'queries', label: 'Queries (#)', type: 'driver' },
+            { id: 'data_added', label: 'Data Added (GB)', type: 'driver' },
+            { id: 'total_data', label: 'Total Data Size (TB)', type: 'driver' },
+            { id: 'eur_integration', label: 'Integration (EUR)', type: 'cost' },
+            { id: 'eur_storage', label: 'Storage (EUR)', type: 'cost' },
+            { id: 'eur_processing', label: 'Processing (EUR)', type: 'cost' },
+            { id: 'eur_analytics', label: 'Analytics (EUR)', type: 'cost' },
+            { id: 'eur_governance', label: 'Governance (EUR)', type: 'cost' },
+            { id: 'eur_operations', label: 'Operations (EUR)', type: 'cost' }
+        ];
+
+        const COUNTRIES = [
+            'Germany', 'United Kingdom', 'France', 'Spain', 'Italy',
+            'United States', 'Canada', 'Mexico',
+            'Australia', 'Japan', 'Singapore', 'India',
+            'Brazil', 'United Arab Emirates', 'South Africa'
+        ];
+
+        let trendData = [];
+        let activeCountry = 'Germany';
+
+        // --- Init & UI Generation ---
+        function init() {
+            populateCountryDropdown();
+            renderDiagram();
+            renderStepInputs();
+
+            // Set initial state
+            document.getElementById('countrySelector').value = activeCountry;
+            document.getElementById('inp_country').value = activeCountry;
+
+            loadStateFromLocal();
+            generateTrendGrid();
+            calc();
+            drawTrendCharts();
+
+            navigateWizard(0); // Initialize Wizard
+        }
+
+        function populateCountryDropdown() {
+            const sel = document.getElementById('countrySelector');
+            COUNTRIES.sort().forEach(c => {
+                let opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                sel.appendChild(opt);
+            });
+        }
+
+        function switchCountry(country) {
+            if (country === 'Global') {
+                document.getElementById('btn-tab-data').style.display = 'none';
+                switchTab('tab-dashboard');
+
+                document.getElementById('dashboard_global_charts').style.display = 'block';
+                document.getElementById('dashboard_country_charts').style.display = 'none';
+                document.getElementById('dashboard_kpi_title').innerText = 'Global Aggregated KPIs';
+
+                calcGlobal();
+                return;
+            }
+
+            // Save current before switching
+            if (activeCountry !== 'Global') {
+                saveStateToLocal();
+            }
+
+            activeCountry = country;
+            document.getElementById('inp_country').value = country;
+
+            document.getElementById('btn-tab-data').style.display = 'inline-block';
+            document.getElementById('dashboard_global_charts').style.display = 'none';
+            document.getElementById('dashboard_country_charts').style.display = 'block';
+            document.getElementById('dashboard_kpi_title').innerText = `${country} Key Performance Indicators`;
+
+            resetForm(false); // clear DOM
+            loadStateFromLocal(); // load new country data
+            generateTrendGrid();
+            calc();
+            drawTrendCharts();
+
+            // Reset Wizard to Step 1 on context switch
+            currentWizardStep = 1;
+            navigateWizard(0);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+
+            if (tabId === 'tab-trends') {
+                // Resize charts if they were hidden during initialization
+                // trendChartTotalInstance?.resize();
+                // trendChartShipmentInstance?.resize();
+            }
+        }
+
+        function navigateWizard(direction) {
+            currentWizardStep += direction;
+
+            // Bounds check
+            if (currentWizardStep < 1) currentWizardStep = 1;
+            if (currentWizardStep > 5) currentWizardStep = 5;
+
+            // Update Progress Bar
+            for (let i = 1; i <= 5; i++) {
+                let marker = document.getElementById(`marker_${i}`);
+                if (!marker) continue;
+
+                marker.classList.remove('active', 'completed');
+                if (i < currentWizardStep) {
+                    marker.classList.add('completed');
+                } else if (i === currentWizardStep) {
+                    marker.classList.add('active');
+                }
+            }
+
+            // Update Content Views
+            document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`wiz_step_${currentWizardStep}`).classList.add('active');
+
+            // Toggle Footer Buttons
+            document.getElementById('btn_wiz_back').style.display = currentWizardStep === 1 ? 'none' : 'inline-block';
+
+            let btnNext = document.getElementById('btn_wiz_next');
+            if (currentWizardStep === 5) {
+                btnNext.style.display = 'none';
+            } else {
+                btnNext.style.display = 'inline-block';
+                btnNext.innerText = 'Next Step →';
+            }
+        }
+
+        function renderDiagram() {
+            const container = document.getElementById('diagramContainer');
+            let html = '';
+            STEPS.forEach((s, i) => {
+                html += `<div class="diagram-step" id="diag_${s.id}" onclick="showStepDetail('${s.id}')">
+               <div class="diagram-icon">${s.icon}</div>
+               <div class="diagram-label">${s.label.split('.')[1]}</div>
+             </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function showStepDetail(id) {
+            document.querySelectorAll('.diagram-step').forEach(e => e.classList.remove('active'));
+            document.getElementById(`diag_${id}`).classList.add('active');
+            const step = STEPS.find(s => s.id === id);
+            const detail = document.getElementById('stepDetailContainer');
+            let leversHtml = step.levers.map(l => `<li>${l}</li>`).join('');
+            detail.innerHTML = `
+    <div style="display:flex; justify-content:space-between;">
+      <div>
+        <strong>${step.label}</strong><br>
+        <span style="font-size:13px; color:#666;">${step.def}</span><br>
+        <span style="font-size:12px; color:#999;">Typical Owner: ${step.owners}</span>
+      </div>
+      <div>
+        <strong style="font-size:13px;">Optimization Levers:</strong>
+        <ul class="lever-list">${leversHtml}</ul>
+      </div>
+    </div>
+  `;
+            detail.classList.add('active');
+        }
+
+        function generateTrendGrid() {
+            const now = new Date();
+            const months = [];
+            for (let i = 23; i >= 0; i--) {
+                let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                let m = d.toISOString().substring(0, 7); // YYYY-MM
+                months.push(m);
+            }
+
+            if (trendData.length !== 24) {
+                trendData = months.map(m => {
+                    let obj = { month: m };
+                    GRID_ROWS.forEach(r => obj[r.id] = 0);
+                    return obj;
+                });
+            }
+
+            let headHtml = '<th>Metric</th>';
+            months.forEach(m => headHtml += `<th>${m}</th>`);
+            document.getElementById('trend_grid_head').innerHTML = headHtml;
+
+            let bodyHtml = '';
+            GRID_ROWS.forEach(row => {
+                let tr = `<tr><td><b>${row.label}</b></td>`;
+                trendData.forEach((col, idx) => {
+                    tr += `<td><input type="number" style="width:80px; padding:4px; font-size:12px;" value="${col[row.id]}" onchange="updateTrendData(${idx}, '${row.id}', this.value)"></td>`;
+                });
+                tr += `</tr>`;
+                bodyHtml += tr;
+            });
+            document.getElementById('trend_grid_body').innerHTML = bodyHtml;
+        }
+
+        function updateTrendData(idx, field, val) {
+            trendData[idx][field] = parseFloat(val) || 0;
+            saveStateToLocal();
+            drawTrendCharts();
+        }
+
+        function drawTrendCharts() {
+            let totals = [];
+            let shipCosts = [];
+            let dataShips = [];
+
+            trendData.forEach(m => {
+                let shipments = m.shipments || 0;
+                let dataAdded = m.data_added || 0;
+                let totalEur = (m.eur_integration + m.eur_storage + m.eur_processing + m.eur_analytics + m.eur_governance + m.eur_operations) || 0;
+
+                totals.push(totalEur);
+                shipCosts.push(shipments > 0 ? (totalEur / shipments) : 0);
+                dataShips.push(shipments > 0 ? (dataAdded / shipments) : 0);
+            });
+
+            drawLineChart('trendChartTotal', totals, '#D40511'); // DHL Red
+            drawLineChart('trendChartShipment', shipCosts, '#FFCC00'); // Yellow
+            drawLineChart('trendChartDataShipment', dataShips, '#4A4A4A'); // Gray
+        }
+
+        function drawLineChart(canvasId, dataPoints, color) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (dataPoints.length === 0) return;
+
+            const w = canvas.width;
+            const h = canvas.height - 40;
+            const padding = 40;
+
+            let maxVal = Math.max(...dataPoints);
+            // Add 10% headroom
+            maxVal = maxVal + (maxVal * 0.1);
+            if (maxVal === 0) maxVal = 1;
+
+            const stepX = (w - padding * 2) / (dataPoints.length - 1);
+
+            // Draw axis line
+            ctx.strokeStyle = '#EAEAEA';
+            ctx.beginPath();
+            ctx.moveTo(padding, 10);
+            ctx.lineTo(padding, h);
+            ctx.lineTo(w - padding, h);
+            ctx.stroke();
+
+            // Draw Line
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+
+            dataPoints.forEach((val, i) => {
+                let x = padding + (i * stepX);
+                let y = h - ((val / maxVal) * (h - 20)); // -20 for top padding
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Draw Dots & Labels
+            ctx.textAlign = 'center';
+            dataPoints.forEach((val, i) => {
+                let x = padding + (i * stepX);
+                let y = h - ((val / maxVal) * (h - 20));
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                // X-axis label
+                if (i % 2 === 0 || i === dataPoints.length - 1) {
+                    ctx.fillStyle = '#666';
+                    ctx.font = '10px sans-serif';
+                    let shortMonth = trendData[i].month.substring(2); // "23-10"
+                    ctx.fillText(shortMonth, x, h + 15);
+                }
+            });
+        }
+
+        function renderStepInputs() {
+            const container = document.getElementById('stepInputsContainer');
+            let html = '';
+            STEPS.forEach(s => {
+
+                // Config vendor units depending on step
+                let unitLabel = 'Units';
+                if (s.id === 'processing') unitLabel = 'DBUs/Node-hours';
+                if (s.id === 'storage') unitLabel = 'GB-months';
+                if (s.id === 'analytics') unitLabel = 'License Seats';
+
+                html += `
+      <div class="step-row">
+        <div class="step-header">
+          <div class="step-title">${s.icon} ${s.label}</div>
+          <label style="margin:0; font-weight:normal;">
+            <input type="checkbox" id="chk_${s.id}" onchange="toggleMode('${s.id}')"> Use Vendor Units
+          </label>
+        </div>
+        <div class="row">
+          <div class="col" style="flex:2;">
+            <label>Direct EUR Cost</label>
+            <input type="number" id="eur_${s.id}" value="0" onchange="calc()" onkeyup="calc()">
+          </div>
+        </div>
+        <div class="mode2-inputs" id="m2_${s.id}">
+          <div class="row">
+            <div class="col">
+              <label>${unitLabel}</label>
+              <input type="number" id="u_${s.id}" value="0" onchange="calcVendor('${s.id}')" onkeyup="calcVendor('${s.id}')">
+            </div>
+            <div class="col">
+              <label>Rate per Unit (EUR)</label>
+              <input type="number" id="r_${s.id}" value="0" step="0.01" onchange="calcVendor('${s.id}')" onkeyup="calcVendor('${s.id}')">
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+            });
+
+            // Storage specific input global
+            container.innerHTML = html + `
+    <div class="step-row" style="background:#fff;">
+      <label>Global: Data Volume Stored (TB-month)</label>
+      <input type="number" id="inp_storageTB" value="" placeholder="Optional" onchange="calc()">
+    </div>
+  `;
+        }
+
+        function toggleMode(id) {
+            const isChecked = document.getElementById(`chk_${id}`).checked;
+            const m2 = document.getElementById(`m2_${id}`);
+            const eurInp = document.getElementById(`eur_${id}`);
+
+            if (isChecked) {
+                m2.classList.add('active');
+                eurInp.setAttribute('readonly', 'true');
+                calcVendor(id);
+            } else {
+                m2.classList.remove('active');
+                eurInp.removeAttribute('readonly');
+            }
+        }
+
+        function calcVendor(id) {
+            const isChecked = document.getElementById(`chk_${id}`).checked;
+            if (!isChecked) return;
+            const u = parseFloat(document.getElementById(`u_${id}`).value) || 0;
+            const r = parseFloat(document.getElementById(`r_${id}`).value) || 0;
+            const tot = u * r;
+            document.getElementById(`eur_${id}`).value = tot.toFixed(2);
+            calc();
+        }
+
+        function toggleFx() {
+            const curr = document.getElementById('inp_currency').value;
+            const fxInp = document.getElementById('inp_fx');
+            if (curr === 'EUR') {
+                fxInp.value = '1.0';
+                fxInp.setAttribute('readonly', 'true');
+            } else {
+                fxInp.removeAttribute('readonly');
+                if (parseFloat(fxInp.value) === 1.0) {
+                    // Dummy default rates if changing from EUR
+                    fxInp.value = curr === 'USD' ? '0.92' : '1.17';
+                }
+            }
+        }
+
+        // --- Calculation Engine ---
+        let computedData = {};
+
+        function calc() {
+            saveStateToLocal();
+
+            const fxRate = parseFloat(document.getElementById('inp_fx').value) || 1.0;
+            const revLocal = parseFloat(document.getElementById('inp_revenue').value) || 0;
+            const revenueEUR = revLocal * fxRate;
+
+            const itCostLocal = parseFloat(document.getElementById('inp_it_cost').value) || 0;
+            const itCostEUR = itCostLocal * fxRate;
+
+            const shipments = parseFloat(document.getElementById('inp_shipments').value) || 0;
+            const totalShipments = parseFloat(document.getElementById('inp_total_shipments').value) || 0;
+
+            const users = parseFloat(document.getElementById('inp_users').value) || 0;
+            const queries = parseFloat(document.getElementById('inp_queries').value) || 0;
+
+            const strTB = parseFloat(document.getElementById('inp_storageTB').value) || 0;
+            const totalDataTB = parseFloat(document.getElementById('inp_total_data').value) || 0;
+            const dataAdded = parseFloat(document.getElementById('inp_data_added').value) || 0;
+
+            let totalEur = 0;
+            const stepCosts = [];
+
+            STEPS.forEach(s => {
+                let eur = parseFloat(document.getElementById(`eur_${s.id}`).value) || 0;
+                // ensure no negative costs
+                if (eur < 0) { eur = 0; document.getElementById(`eur_${s.id}`).value = "0"; }
+                totalEur += eur;
+                stepCosts.push({ id: s.id, label: s.label, eur: eur });
+            });
+
+            // KPI Calculations
+            const activeShipments = totalShipments > 0 ? totalShipments : shipments;
+            const costPerShip = activeShipments > 0 ? totalEur / activeShipments : 0;
+            const costPerUser = users > 0 ? totalEur / users : 0;
+            const pctRev = revenueEUR > 0 ? (totalEur / revenueEUR) * 100 : 0;
+            const pctItCost = itCostEUR > 0 ? (totalEur / itCostEUR) * 100 : 0;
+
+            let procEur = stepCosts.find(x => x.id === 'processing').eur;
+            let strEur = stepCosts.find(x => x.id === 'storage').eur;
+            let anaEur = stepCosts.find(x => x.id === 'analytics').eur;
+
+            const procPerQuery = queries > 0 ? procEur / queries : 0;
+            const activeData = totalDataTB > 0 ? totalDataTB : strTB;
+            const strPerTB = activeData > 0 ? strEur / activeData : 0;
+            const dataPerShip = activeShipments > 0 ? dataAdded / activeShipments : 0;
+
+            // Render KPIs dynamically
+            const kpiHtml = `
+                <div class="kpi-box" style="border-left-color: var(--dhl-red);">
+                    <div class="kpi-title">Total BI Cost</div>
+                    <div class="kpi-value">${formatEur(totalEur, 0)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Data/Shipment (GB)</div>
+                    <div class="kpi-value">${dataPerShip.toFixed(6)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Cost / Shipment</div>
+                    <div class="kpi-value">${formatEur(costPerShip, 4)}</div>
+                    <div class="kpi-sub" style="font-size: 10px;">Based on Total Shipments</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Cost / Active User</div>
+                    <div class="kpi-value">${formatEur(costPerUser, 2)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">% of Revenue</div>
+                    <div class="kpi-value">${pctRev.toFixed(3)}%</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">% of IT Cost</div>
+                    <div class="kpi-value">${pctItCost.toFixed(3)}%</div>
+                </div>
+            `;
+            const kpiContainer = document.getElementById('kpi_container');
+            if (kpiContainer) kpiContainer.innerHTML = kpiHtml;
+
+            // Render Table
+            let tblHtml = '';
+            stepCosts.forEach(s => {
+                const pct = totalEur > 0 ? (s.eur / totalEur) * 100 : 0;
+                const s_ship = shipments > 0 ? s.eur / shipments : 0;
+                const s_usr = users > 0 ? s.eur / users : 0;
+                tblHtml += `<tr>
+      <td>${s.label}</td>
+      <td class="text-right">${formatEur(s.eur, 0)}</td>
+      <td class="text-right">${pct.toFixed(1)}%</td>
+      <td class="text-right">${formatEur(s_ship, 4)}</td>
+      <td class="text-right">${formatEur(s_usr, 2)}</td>
+    </tr>`;
+            });
+            document.getElementById('tbl_body').innerHTML = tblHtml;
+            document.getElementById('tbl_tot_eur').innerText = formatEur(totalEur, 0);
+            document.getElementById('tbl_tot_ship').innerText = formatEur(costPerShip, 4);
+            document.getElementById('tbl_tot_user').innerText = formatEur(costPerUser, 2);
+
+            // Scoring Module
+            let score = 5;
+            let missing = 0;
+            if (totalEur === 0) { score = 1; }
+            else if (shipments === 0) { score = 1; }
+            else {
+                if (!revenueEUR) missing++;
+                if (!users) missing++;
+                if (!queries) missing++;
+                if (!strTB) missing++;
+
+                if (missing >= 3) score = 2;
+                else if (missing === 2) score = 3;
+                else if (missing === 1) score = 4;
+            }
+
+            let scBadge = document.getElementById('out_score');
+            scBadge.innerText = `Score: ${score}/5`;
+            if (score >= 4) scBadge.style.background = '#00875A'; // green
+            else if (score === 3) scBadge.style.background = 'var(--dhl-yellow)';
+            else scBadge.style.background = 'var(--dhl-red)';
+            scBadge.style.color = score >= 4 ? '#fff' : '#fff';
+            if (score === 3) scBadge.style.color = '#333';
+
+            let scText = '';
+            if (score === 5) scText = 'Perfect data completeness. KPIs are highly comparable across countries.';
+            if (score === 4) scText = 'Good completeness. Provide optional metrics (Queries or TB Store) to unlock detailed tech KPIs.';
+            if (score === 3) scText = 'Medium comparability. Missing primary business drivers (Revenue or Users).';
+            if (score <= 2) scText = 'Low comparability. Please populate basic drivers (Shipments, revenue, users).';
+            document.getElementById('out_score_text').innerText = scText;
+
+            // Advanced Alerts & Levers
+            const alertsContainer = document.getElementById('alerts_container');
+            let alertsHtml = '';
+
+            if (users > 0 && document.getElementById('chk_analytics').checked) {
+                let seats = parseFloat(document.getElementById('u_analytics').value) || 0;
+                if (seats > 0) {
+                    let util = (users / seats) * 100;
+                    if (util < 50) alertsHtml += `<div class="alert alert-warning"><b>License Utilization Risk:</b> Only ${util.toFixed(1)}% of paid Analytics seats are actively used.</div>`;
+                }
+            }
+
+            const procPct = totalEur > 0 ? (procEur / totalEur) : 0;
+            const strPct = totalEur > 0 ? (strEur / totalEur) : 0;
+            if ((procPct + strPct) > 0.60) {
+                alertsHtml += `<div class="alert alert-danger"><b>Architecture Inefficiency Risk:</b> Processing & Storage consume >60% of total BI cost. Check for monolithic data modeling or missing aggregate layers.</div>`;
+            }
+
+            alertsContainer.innerHTML = alertsHtml;
+
+            // Optimization Box
+            const optPanel = document.getElementById('optimization_panel');
+            const optContent = document.getElementById('optimization_content');
+            let highestStep = stepCosts.reduce((max, obj) => obj.eur > max.eur ? obj : max, { eur: -1 });
+
+            if (totalEur > 0 && highestStep.eur / totalEur > 0.35) {
+                optPanel.style.display = 'block';
+                let stObj = STEPS.find(x => x.id === highestStep.id);
+                let levBullets = stObj.levers.map(l => `<li>${l}</li>`).join('');
+                optContent.innerHTML = `
+        <p><b>${stObj.label}</b> is consuming <b>${((highestStep.eur / totalEur) * 100).toFixed(1)}%</b> of total costs, exceeding the typical 35% threshold.</p>
+        <p><b>Suggested Levers:</b></p>
+        <ul class="lever-list">${levBullets}</ul>
+      `;
+            } else {
+                optPanel.style.display = 'none';
+            }
+
+            // Draw charts
+            drawStackedBar(stepCosts, totalEur);
+            drawBarChart(stepCosts, shipments, totalEur);
+
+            // Expose computed data for export
+            computedData = {
+                metadata: {
+                    country: document.getElementById('inp_country').value,
+                    month: document.getElementById('inp_month').value,
+                    currency: document.getElementById('inp_currency').value,
+                    fxRate: fxRate,
+                    timestamp: new Date().toISOString()
+                },
+                inputs: {
+                    shipments, totalShipments, users, revenueLocal: revLocal, itCostLocal, queries, storageTB: strTB, dataAdded, totalDataTB
+                },
+                costs: stepCosts,
+                kpis: {
+                    totalEur, costPerShip, costPerUser, pctRev, pctItCost, procPerQuery, strPerTB, dataPerShip, score
+                }
+            };
+        }
+
+        // --- Chart Rendering (Canvas) ---
+        function drawStackedBar(costs, total) {
+            const canvas = document.getElementById('stackChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (total === 0) return;
+
+            const barHeight = 40;
+            const startY = 50;
+            let currentX = 0;
+            const width = canvas.width - 40;
+
+            // Draw segments
+            costs.forEach((c, i) => {
+                let w = (c.eur / total) * width;
+                ctx.fillStyle = COLORS[i % COLORS.length];
+                ctx.fillRect(20 + currentX, startY, w, barHeight);
+                currentX += w;
+            });
+
+            // Legend
+            let lgY = 120;
+            costs.forEach((c, i) => {
+                if (c.eur === 0) return;
+                let col = i % 2 === 0 ? 20 : 160;
+                let rr = Math.floor(i / 2) * 20;
+                ctx.fillStyle = COLORS[i % COLORS.length];
+                ctx.fillRect(col, lgY + rr, 12, 12);
+                ctx.fillStyle = '#333';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(`${c.label.substring(3)} (${((c.eur / total) * 100).toFixed(1)}%)`, col + 18, lgY + rr + 10);
+            });
+        }
+
+        function drawBarChart(costs, shipments, total) {
+            const canvas = document.getElementById('barChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (total === 0 || shipments === 0) return;
+
+            const w = canvas.width;
+            const h = canvas.height - 40;
+
+            // Find max cost per ship
+            let maxCPS = Math.max(...costs.map(c => c.eur / shipments));
+            if (maxCPS === 0) return;
+
+            const barWidth = (w - 40) / costs.length;
+
+            costs.forEach((c, i) => {
+                let cps = c.eur / shipments;
+                let barH = (cps / maxCPS) * (h - 40);
+                ctx.fillStyle = COLORS[i % COLORS.length];
+                ctx.fillRect(20 + (i * barWidth) + 5, h - barH, barWidth - 10, barH);
+
+                // label
+                ctx.fillStyle = '#666';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                let shortName = c.label.split(' ')[1].substring(0, 4);
+                ctx.fillText(shortName, 20 + (i * barWidth) + (barWidth / 2), h + 15);
+
+                // value
+                ctx.fillStyle = '#333';
+                if (barH > 15) {
+                    ctx.fillText(cps.toFixed(4), 20 + (i * barWidth) + (barWidth / 2), h - barH - 5);
+                }
+            });
+        }
+
+        // --- Utils ---
+        function formatEur(val, dec) {
+            return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec }).format(val);
+        }
+
+        // --- Scenarios & State Mgmt ---
+        function loadExample(type) {
+            resetForm(false);
+
+            // Default active driver bounds for most examples
+            document.getElementById('inp_shipments').value = 5000000;
+            document.getElementById('inp_users').value = 500;
+            document.getElementById('inp_revenue').value = 25000000;
+            document.getElementById('inp_queries').value = 200000;
+            document.getElementById('inp_storageTB').value = 50;
+            document.getElementById('inp_data_added').value = 500;
+
+            if (type === 'balanced') {
+                document.getElementById('eur_integration').value = 2000;
+                document.getElementById('eur_storage').value = 3000;
+                document.getElementById('eur_processing').value = 8000;
+                document.getElementById('eur_analytics').value = 8000;
+                document.getElementById('eur_governance').value = 1500;
+                document.getElementById('eur_operations').value = 2500;
+            }
+            else if (type === 'processing') {
+                document.getElementById('inp_queries').value = 1500000;
+                document.getElementById('inp_data_added').value = 1500;
+                document.getElementById('eur_integration').value = 3000;
+                document.getElementById('eur_storage').value = 6000;
+                document.getElementById('eur_processing').value = 35000;
+                document.getElementById('eur_analytics').value = 5000;
+                document.getElementById('eur_governance').value = 500;
+                document.getElementById('eur_operations').value = 2000;
+            }
+            else if (type === 'license') {
+                document.getElementById('inp_users').value = 100; // active is low
+                document.getElementById('chk_analytics').checked = true;
+                toggleMode('analytics');
+                document.getElementById('u_analytics').value = 1000; // 1000 seats paid
+                document.getElementById('r_analytics').value = 45; // 45 EUR per seat
+
+                document.getElementById('eur_integration').value = 2000;
+                document.getElementById('eur_storage').value = 2000;
+                document.getElementById('eur_processing').value = 4000;
+                // Consumption costs stripped or ignored because Analytics is locked via units
+                document.getElementById('eur_governance').value = 1000;
+                document.getElementById('eur_operations').value = 1500;
+            }
+            else if (type === 'storage') {
+                document.getElementById('inp_storageTB').value = 5000; // Huge data lake
+                document.getElementById('inp_data_added').value = 10000;
+                document.getElementById('eur_integration').value = 4000;
+                document.getElementById('eur_storage').value = 45000;
+                document.getElementById('eur_processing').value = 3000;
+                document.getElementById('eur_analytics').value = 2500;
+                document.getElementById('eur_governance').value = 1000;
+                document.getElementById('eur_operations').value = 3000;
+            }
+            else if (type === 'sprawl') {
+                document.getElementById('inp_users').value = 1500;
+                document.getElementById('eur_integration').value = 5000;
+                document.getElementById('eur_storage').value = 8000;
+                document.getElementById('eur_processing').value = 22000;
+                document.getElementById('eur_analytics').value = 40000;
+                document.getElementById('eur_governance').value = 2000;
+                document.getElementById('eur_operations').value = 30000; // Shadow IT / Sprawl operations
+            }
+            else if (type === 'elt') {
+                document.getElementById('eur_integration').value = 18000; // High integration syncs
+                document.getElementById('eur_storage').value = 5000;
+                document.getElementById('eur_processing').value = 25000; // Heavy dbt/SQL overlap
+                document.getElementById('eur_analytics').value = 5500;
+                document.getElementById('eur_governance').value = 500;
+                document.getElementById('eur_operations').value = 8000;
+            }
+            else if (type === 'optimized') {
+                document.getElementById('inp_queries').value = 5000; // Highly cached, low ad-hoc querying
+                document.getElementById('inp_users').value = 800; // Great adoption
+                document.getElementById('inp_data_added').value = 2000;
+                document.getElementById('eur_integration').value = 1000;
+                document.getElementById('eur_storage').value = 1200;
+                document.getElementById('eur_processing').value = 1500;
+                document.getElementById('eur_analytics').value = 3500; // Right-sized licenses
+                document.getElementById('eur_governance').value = 800; // Automated DQ
+                document.getElementById('eur_operations').value = 1200; // Serverless
+            }
+            calc();
+        }
+
+        function resetForm(clearLocal = true) {
+            document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = '');
+            document.querySelectorAll('input[type="number"][id^="eur_"]').forEach(i => i.value = '0');
+            document.querySelectorAll('input[type="number"][id^="u_"], input[type="number"][id^="r_"]').forEach(i => i.value = '0');
+            document.getElementById('inp_fx').value = '1.0';
+            document.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; toggleMode(c.id.substring(4)); });
+
+            if (clearLocal) {
+                localStorage.removeItem(`bi_cost_state_${activeCountry}`);
+                localStorage.removeItem(`bi_cost_trend_${activeCountry}`);
+                document.getElementById('inp_month').value = '2023-10';
+            }
+            document.getElementById('inp_country').value = activeCountry; // preserve name
+            calc();
+        }
+
+        function saveStateToLocal() {
+            if (activeCountry === 'Global') return;
+
+            const inputs = document.querySelectorAll('#tab-current input, #tab-current select');
+            let state = {};
+            inputs.forEach(i => {
+                if (i.type === 'checkbox') state[i.id] = i.checked;
+                else state[i.id] = i.value;
+            });
+            localStorage.setItem(`bi_cost_state_${activeCountry}`, JSON.stringify(state));
+            localStorage.setItem(`bi_cost_trend_${activeCountry}`, JSON.stringify(trendData));
+        }
+
+        function loadStateFromLocal() {
+            if (activeCountry === 'Global') return;
+
+            const saved = localStorage.getItem(`bi_cost_state_${activeCountry}`);
+            if (saved) {
+                const state = JSON.parse(saved);
+                Object.keys(state).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) {
+                        if (el.type === 'checkbox') {
+                            el.checked = state[k];
+                            toggleMode(k.substring(4));
+                        } else {
+                            el.value = state[k];
+                        }
+                    }
+                });
+            } else {
+                // If no saved state, ensure the country name is at least populated
+                document.getElementById('inp_country').value = activeCountry;
+            }
+
+            const savedTrend = localStorage.getItem(`bi_cost_trend_${activeCountry}`);
+            if (savedTrend) {
+                try {
+                    let parsed = JSON.parse(savedTrend);
+                    if (parsed && parsed.length === 24) {
+                        trendData = parsed;
+                    }
+                } catch (e) { }
+            } else {
+                trendData = []; // clear to force regeneration
+            }
+        }
+
+        // --- Global Dashboard Engine ---
+        function calcGlobal() {
+            let globalTotalCost = 0;
+            let globalTotalShipments = 0;
+            let globalUsers = 0;
+            let globalDataTB = 0;
+
+            let countryCosts = [];
+            let countryCps = [];
+            let countryLabels = [];
+
+            // Aggregate Trend Data
+            let globalTrendData = new Array(24);
+            const now = new Date();
+            for (let i = 23; i >= 0; i--) {
+                let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                let m = d.toISOString().substring(0, 7);
+                let obj = { month: m };
+                GRID_ROWS.forEach(r => obj[r.id] = 0);
+                globalTrendData[23 - i] = obj;
+            }
+
+            COUNTRIES.forEach(c => {
+                // Add to Global Trend Array
+                const savedTrend = localStorage.getItem(`bi_cost_trend_${c}`);
+                if (savedTrend) {
+                    try {
+                        let parsed = JSON.parse(savedTrend);
+                        if (parsed && parsed.length === 24) {
+                            parsed.forEach((m, idx) => {
+                                GRID_ROWS.forEach(r => {
+                                    globalTrendData[idx][r.id] += (m[r.id] || 0);
+                                });
+                            });
+                        }
+                    } catch (e) { }
+                }
+
+                // Append purely state snapshot metrics
+                const savedAttr = localStorage.getItem(`bi_cost_state_${c}`);
+                if (savedAttr) {
+                    try {
+                        let state = JSON.parse(savedAttr);
+                        let fxRate = parseFloat(state.inp_fx) || 1.0;
+
+                        let totalEur = 0;
+                        STEPS.forEach(s => {
+                            let val = 0;
+                            if (state[`chk_${s.id}`]) {
+                                val = parseFloat(state[`u_${s.id}`] || 0) * parseFloat(state[`r_${s.id}`] || 0);
+                            } else {
+                                val = parseFloat(state[`eur_${s.id}`] || 0);
+                            }
+                            totalEur += val;
+                        });
+
+                        let ships = parseFloat(state.inp_total_shipments) || parseFloat(state.inp_shipments) || 0;
+                        let users = parseFloat(state.inp_users) || 0;
+                        let data = parseFloat(state.inp_total_data) || parseFloat(state.inp_storageTB) || 0;
+
+                        if (totalEur > 0) {
+                            globalTotalCost += totalEur;
+                            globalTotalShipments += ships;
+                            globalUsers += users;
+                            globalDataTB += data;
+
+                            countryLabels.push(c);
+                            countryCosts.push(totalEur);
+                            countryCps.push(ships > 0 ? totalEur / ships : 0);
+                        }
+                    } catch (e) { }
+                }
+            });
+
+            // Calculate aggregate metrics
+            let globalCps = globalTotalShipments > 0 ? globalTotalCost / globalTotalShipments : 0;
+            let globalCpu = globalUsers > 0 ? globalTotalCost / globalUsers : 0;
+
+            const kpiHtml = `
+                <div class="kpi-box" style="border-left-color: var(--dhl-red);">
+                    <div class="kpi-title">Global Total BI Cost</div>
+                    <div class="kpi-value">${formatEur(globalTotalCost, 0)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Global Cost / Shipment</div>
+                    <div class="kpi-value">${formatEur(globalCps, 4)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Global Processed Shipments</div>
+                    <div class="kpi-value">${new Intl.NumberFormat('en-IE').format(globalTotalShipments)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Global Cost / DB User</div>
+                    <div class="kpi-value">${formatEur(globalCpu, 2)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Total Active Users</div>
+                    <div class="kpi-value">${new Intl.NumberFormat('en-IE').format(globalUsers)}</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Active Global Data Size</div>
+                    <div class="kpi-value">${globalDataTB.toFixed(1)} TB</div>
+                </div>
+            `;
+            document.getElementById('kpi_container').innerHTML = kpiHtml;
+
+            // Sort data to make charts look nice
+            let sortedCosts = [...countryCosts].map((v, i) => ({ v, label: countryLabels[i] })).sort((a, b) => b.v - a.v);
+            let sortedCps = [...countryCps].map((v, i) => ({ v, label: countryLabels[i] })).sort((a, b) => b.v - a.v);
+
+            drawGlobalBarChart('globalBarChart', sortedCosts.map(x => x.label), sortedCosts.map(x => x.v), false);
+            drawGlobalBarChart('globalCpsChart', sortedCps.map(x => x.label), sortedCps.map(x => x.v), true);
+
+            // Draw Global Trend Charts
+            let gTotals = [];
+            let gShipCosts = [];
+            let gDataShips = [];
+
+            globalTrendData.forEach(m => {
+                let shipments = m.shipments || 0;
+                let dataAdded = m.data_added || 0;
+                let totalEur = (m.eur_integration + m.eur_storage + m.eur_processing + m.eur_analytics + m.eur_governance + m.eur_operations) || 0;
+
+                gTotals.push(totalEur);
+                gShipCosts.push(shipments > 0 ? (totalEur / shipments) : 0);
+                gDataShips.push(shipments > 0 ? (dataAdded / shipments) : 0);
+            });
+
+            drawLineChart('trendChartTotal', gTotals, '#D40511');
+            drawLineChart('trendChartShipment', gShipCosts, '#FFCC00');
+            drawLineChart('trendChartDataShipment', gDataShips, '#4A4A4A');
+        }
+
+        function drawGlobalBarChart(canvasId, labels, data, isCurrencyDecimal) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (data.length === 0) return;
+
+            const w = canvas.width;
+            const h = canvas.height - 50; // extra padding for bottom text
+            const barWidth = (w - 40) / data.length;
+            let maxVal = Math.max(...data);
+            if (maxVal === 0) return;
+
+            data.forEach((val, i) => {
+                let barH = (val / maxVal) * (h - 30);
+                ctx.fillStyle = COLORS[i % COLORS.length];
+                ctx.fillRect(20 + (i * barWidth) + 5, h - barH, barWidth - 10, barH);
+
+                // Label (Country Code)
+                ctx.fillStyle = '#666';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                // Take first 3 letters of country
+                let shortName = labels[i].substring(0, 3).toUpperCase();
+                ctx.fillText(shortName, 20 + (i * barWidth) + (barWidth / 2), h + 15);
+
+                // Number
+                ctx.fillStyle = '#333';
+                if (barH > 15) {
+                    ctx.fillText(isCurrencyDecimal ? val.toFixed(4) : new Intl.NumberFormat('en-IE', { notation: "compact", compactDisplay: "short" }).format(val), 20 + (i * barWidth) + (barWidth / 2), h - barH - 5);
+                }
+            });
+        }
+
+
+        // --- Export ---
+        function exportCsv() {
+            if (!computedData.costs) return;
+            let csv = 'Step,EUR Cost,Cost_per_Shipment,Cost_per_User\n';
+            computedData.costs.forEach(c => {
+                csv += `"${c.label}",${c.eur},${computedData.kpis.shipments > 0 ? c.eur / computedData.inputs.shipments : 0},${computedData.inputs.users > 0 ? c.eur / computedData.inputs.users : 0}\n`;
+            });
+            csv += `"Total",${computedData.kpis.totalEur},${computedData.kpis.costPerShip},${computedData.kpis.costPerUser}\n`;
+
+            downloadBlob(csv, 'text/csv', 'bi_costs_export.csv');
+        }
+
+        function exportJson() {
+            if (!computedData.costs) return;
+            const json = JSON.stringify(computedData, null, 2);
+            downloadBlob(json, 'application/json', 'bi_costs_report.json');
+        }
+
+        function downloadBlob(content, type, filename) {
+            const blob = new Blob([content], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Start
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+</body>
+
+</html>

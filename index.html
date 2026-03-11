@@ -4,667 +4,1063 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Comparable BI Cost Framework</title>
+    <title>BI Cost Framework V2</title>
+
+    <!-- Google Fonts: Inter for clean SaaS data aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js for beautiful chart rendering (instead of raw canvas lines everywhere) -->
+    <!-- Let's stick strictly to Vanilla JS Canvas as per earlier constraints, unless authorized. I will stick to Vanilla JS Canvas to keep it lightweight. -->
+
     <style>
         :root {
-            --dhl-red: #D40511;
+            /* Branding Colors */
             --dhl-yellow: #FFCC00;
-            --dhl-dark: #222222;
-            --text-dark: #222222;
-            --text-light: #555555;
-            --bg-white: #FFFFFF;
-            --bg-light: #F5F6F8;
-            --border-grey: #D5D5D5;
-            --chart-colors: #FFCC00, #D40511, #4A4A4A, #888888, #FFEB85, #990000, #222222;
+            --dhl-red: #D40511;
+
+            /* UI Palette */
+            --bg-body: #F4F5F7;
+            --bg-sidebar: #1E202B;
+            --bg-panel: #FFFFFF;
+
+            --text-main: #172B4D;
+            --text-muted: #5E6C84;
+            --text-sidebar: #9BA3B5;
+            --text-sidebar-active: #FFFFFF;
+
+            --border-light: #DFE1E6;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+            /* Chart Colors */
+            --chart-1: #36B37E;
+            --chart-2: #FF5630;
+            --chart-3: #FFAB00;
+            --chart-4: #0052CC;
+            --chart-5: #6554C0;
+            --chart-6: #00B8D9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: var(--text-dark);
-            background: var(--bg-light);
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        header {
-            background: var(--bg-white);
-            border-top: 4px solid var(--dhl-red);
-            padding: 20px 40px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        /* --- LAYOUT: SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            color: var(--text-sidebar);
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
         }
 
-        h1,
-        h2,
-        h3,
-        h4 {
-            margin-top: 0;
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
         }
 
-        h1 {
-            font-size: 24px;
-            color: var(--text-dark);
-            margin-bottom: 5px;
+        .sidebar-header h2 {
+            color: #FFF;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        p {
-            margin: 0 0 15px 0;
+        .sidebar-header .brand-accent {
+            width: 8px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--dhl-red) 50%, var(--dhl-yellow) 50%);
+            border-radius: 2px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 20px auto;
-            padding: 0 20px;
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px 20px 5px;
+            font-weight: 600;
+            opacity: 0.6;
         }
 
-        .card {
-            background: var(--bg-white);
-            border: 1px solid var(--border-grey);
-            border-radius: 4px;
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-sidebar-active);
+        }
+
+        .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--text-sidebar-active);
+            border-left-color: var(--dhl-yellow);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
             padding: 20px;
-            margin-bottom: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        /* --- LAYOUT: MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .top-navbar {
+            height: 60px;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: var(--shadow-sm);
+            z-index: 5;
+            position: sticky;
+            top: 0;
+        }
+
+        .top-navbar .page-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .top-navbar .context-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .top-navbar select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--bg-body);
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* --- VIEWS --- */
+        .view-container {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- COMPONENT CLASSES --- */
+        .card {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+            padding: 24px;
+            margin-bottom: 24px;
         }
 
         .card-header {
-            border-bottom: 2px solid var(--bg-light);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 12px;
         }
 
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
         }
 
         .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
+            gap: 24px;
         }
 
         .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 24px;
         }
 
-        .grid-5 {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
+        /* KPI Mini Cards */
+        .kpi-card {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            padding: 20px 20px 10px 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
         }
 
-        .grid-6 {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
+        .sparkline {
+            width: 100%;
+            height: 45px;
+            margin-top: 10px;
+            pointer-events: none;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--border-light);
         }
 
-        .grid-outputs {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 20px;
+        .kpi-card.accent-red::before {
+            background: var(--dhl-red);
         }
 
-        .btn {
+        .kpi-card.accent-yellow::before {
             background: var(--dhl-yellow);
-            color: var(--text-dark);
-            border: 1px solid #E5B800;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 2px;
-            font-size: 14px;
-            transition: background 0.2s;
         }
 
-        .btn:hover {
-            background: #E5B800;
+        .kpi-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            font-family: inherit;
+            font-size: 14px;
+            transition: border 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--dhl-red);
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--dhl-red);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #B3000A;
         }
 
         .btn-outline {
             background: transparent;
-            border: 1px solid var(--border-grey);
-            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            color: var(--text-main);
         }
 
         .btn-outline:hover {
-            background: var(--bg-light);
+            background: var(--bg-body);
         }
 
-        .btn-small {
-            padding: 4px 8px;
-            font-size: 12px;
+        /* Split Screen Specifics for Data Entry */
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            height: calc(100vh - 120px);
+            align-items: start;
         }
 
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: bold;
-            margin-bottom: 4px;
-            color: var(--text-light);
+        .split-left {
+            overflow-y: auto;
+            padding-right: 10px;
+            height: 100%;
         }
 
-        input[type="number"],
-        input[type="text"],
-        input[type="month"],
-        select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--border-grey);
-            border-radius: 2px;
-            box-sizing: border-box;
-            font-size: 14px;
+        .split-right {
+            position: sticky;
+            top: 30px;
         }
 
-        input[readonly] {
-            background: var(--bg-light);
-            color: var(--text-light);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th,
-        td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-grey);
-        }
-
-        th {
-            background: var(--bg-light);
-            font-weight: bold;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .kpi-box {
-            background: var(--bg-light);
-            border: 1px solid var(--border-grey);
-            border-left: 4px solid var(--dhl-yellow);
-            padding: 15px;
-            text-align: center;
-        }
-
-        .kpi-title {
-            font-size: 12px;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: var(--text-dark);
-        }
-
-        .kpi-sub {
-            font-size: 12px;
-            color: var(--text-light);
-        }
-
-        .step-row {
-            background: var(--bg-light);
-            border: 1px solid var(--border-grey);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 2px;
-        }
-
-        .step-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .step-title {
-            font-weight: bold;
-            font-size: 15px;
-        }
-
-        .mode2-inputs {
-            display: none;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed var(--border-grey);
-        }
-
-        .mode2-inputs.active {
-            display: block;
-        }
-
-        canvas {
-            max-width: 100%;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .diagram {
-            display: flex;
-            justify-content: space-between;
-            background: var(--bg-white);
-            padding: 20px;
-            border: 1px solid var(--border-grey);
-            border-radius: 4px;
-            overflow-x: auto;
-        }
-
-        .diagram-step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-            padding: 10px;
-            min-width: 100px;
-            border-right: 1px solid var(--border-grey);
-            cursor: pointer;
-        }
-
-        .diagram-step:last-child {
-            border-right: none;
-        }
-
-        .diagram-step:hover {
-            background: var(--bg-light);
-        }
-
-        .diagram-step.active {
-            border-bottom: 4px solid var(--dhl-red);
-            background: var(--bg-light);
-        }
-
-        .diagram-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .diagram-label {
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .step-detail {
-            background: var(--bg-light);
-            padding: 15px;
-            border: 1px solid var(--border-grey);
-            margin-top: -1px;
-            display: none;
-        }
-
-        .step-detail.active {
-            display: block;
-        }
-
-        .alert {
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            border-radius: 2px;
-            font-size: 14px;
-        }
-
-        .alert-warning {
-            background: #FFF3CD;
-            border: 1px solid #FFEEBA;
-            color: #856404;
-            border-left: 4px solid var(--dhl-yellow);
-        }
-
-        .alert-danger {
-            background: #F8D7DA;
-            border: 1px solid #F5C6CB;
-            color: #721C24;
-            border-left: 4px solid var(--dhl-red);
-        }
-
-        .score-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 12px;
-            background: var(--dhl-yellow);
-            font-weight: bold;
-            font-size: 14px;
-            margin-left: 10px;
-        }
-
-        .lever-list {
-            margin: 0;
-            padding-left: 20px;
-            font-size: 13px;
-        }
-
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-grey);
-            padding: 0 20px;
-        }
-
-        .tab-btn {
-            padding: 10px 20px;
-            cursor: pointer;
-            border: none;
+        ::-webkit-scrollbar-track {
             background: transparent;
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--text-light);
-            border-bottom: 3px solid transparent;
-            outline: none;
-            transition: color 0.2s, border-bottom 0.2s;
         }
 
-        .tab-btn:hover {
-            color: var(--text-dark);
+        ::-webkit-scrollbar-thumb {
+            background: #C1C7D0;
+            border-radius: 3px;
         }
 
-        .tab-btn.active {
-            color: var(--text-dark);
-            border-bottom: 3px solid var(--dhl-red);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A5ADBA;
         }
     </style>
+    <!-- ALGORITHMIC DATA HANDLING -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
 
-    <header>
-        <h1>Global Comparable BI Cost Framework</h1>
-        <p style="color: var(--text-light); margin: 0; font-size: 14px;">Establish a consistent methodology to analyze
-            and optimize end-to-end data processing and analytics costs.</p>
-    </header>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-current')">Current Snapshot</button>
-        <button class="tab-btn" onclick="switchTab('tab-trends')">24-Month Trends</button>
-    </div>
-
-    <div class="container">
-
-        <div id="tab-current" class="tab-content active">
-
-            <div class="card">
-                <div class="card-header">
-                    Methodology & Data Journey
-                    <div
-                        style="font-size: 12px; font-weight: normal; color: var(--text-light); display: flex; flex-wrap: wrap; gap: 5px; justify-content: flex-end; max-width: 65%;">
-                        <button class="btn btn-outline btn-small" onclick="loadExample('balanced')">Balanced</button>
-                        <button class="btn btn-outline btn-small" onclick="loadExample('processing')">Processing
-                            Heavy</button>
-                        <button class="btn btn-outline btn-small" onclick="loadExample('storage')">Data Lake</button>
-                        <button class="btn btn-outline btn-small" onclick="loadExample('license')">License
-                            Waste</button>
-                        <button class="btn btn-outline btn-small" onclick="loadExample('sprawl')">Sprawl</button>
-                        <button class="btn btn-outline btn-small" onclick="loadExample('elt')">ELT Migration</button>
-                        <button class="btn btn-outline btn-small" onclick="loadExample('optimized')"
-                            style="border-color: var(--dhl-red); border-width: 2px; color: var(--text-dark); background-color: var(--dhl-yellow); font-weight: bold;">Best
-                            Optimised</button>
-                        <button class="btn btn-outline btn-small" onclick="resetForm()">Reset</button>
-                    </div>
-                </div>
-
-                <div style="font-size: 13px; margin-bottom: 20px;">
-                    <b>Inclusions (Tooling & Central FTEs):</b> Infrastructure, platform tools, and Centralized
-                    headcount
-                    (e.g., Data Engineers, BI Developers, Platform Support FTEs).<br>
-                    <b>Exclusions:</b> Operational source systems (ERP/CRM), distributed/local business analyst
-                    headcount,
-                    and one-off project costs.<br>
-                    <b>Translation Layer:</b> Enter costs directly in standardized EUR, or use "Vendor Units" to
-                    auto-convert local metrics into normalized EUR costs.
-                </div>
-
-                <div class="diagram" id="diagramContainer">
-                    <!-- Generated via JS -->
-                </div>
-                <div class="step-detail" id="stepDetailContainer"></div>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>
+                <div class="brand-accent"></div> BI Cost Framework
+            </h2>
+            <div class="nav-section-title">Core Modules</div>
+            <div class="nav-item active" onclick="switchView('v_guidance', this)">
+                <span>📖</span> Framework Guidance
+            </div>
+            <div class="nav-item" onclick="switchView('v_global', this)">
+                <span>🌍</span> BI Costing Performance Dashboard
+            </div>
+            <div class="nav-item" onclick="switchView('v_ingestion', this)">
+                <span>📝</span> Data Ingestion
+            </div>
+            <div class="nav-item" onclick="switchView('v_master', this)">
+                <span>⚙️</span> Masterdata Explorer
             </div>
 
-            <div class="grid-outputs">
+            <div class="sidebar-footer">
+                V2.0.0 Architecture<br>DHL eCommerce Framework
+            </div>
+    </nav>
 
-                <div class="inputs-panel">
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- TOP NAVBAR -->
+        <header class="top-navbar">
+            <div class="page-title" id="lbl_page_title">BI Costing Performance Dashboard</div>
+            <div class="context-selector">
+                <span style="color: var(--text-muted); font-weight: 600;">Active Context:</span>
+                <select id="header_country_select" onchange="handleContextChange(this.value)">
+                    <option value="Global">All Countries (Global)</option>
+                    <!-- Populated via JS -->
+                </select>
+            </div>
+        </header>
 
-                    <div class="card">
-                        <div class="card-header">1. Global Dimensions</div>
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Country</label>
-                                <input type="text" id="inp_country" value="Germany" onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Period</label>
-                                <input type="month" id="inp_month" value="2023-10" onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Currency</label>
-                                <select id="inp_currency" onchange="toggleFx(); calc()">
-                                    <option value="EUR">EUR</option>
-                                    <option value="USD">USD</option>
-                                    <option value="GBP">GBP</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>FX to EUR</label>
-                                <input type="number" id="inp_fx" value="1.0" step="0.01" readonly onchange="calc()">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">2. Business Drivers</div>
-                        <div class="grid-2">
-                            <div class="form-group">
-                                <label>Monthly Shipments (#)</label>
-                                <input type="number" id="inp_shipments" value="" placeholder="e.g. 500000"
-                                    onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Total Shipments (Annual/YTD)</label>
-                                <input type="number" id="inp_total_shipments" value="" placeholder="e.g. 6000000"
-                                    onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Active BI Users (#)</label>
-                                <input type="number" id="inp_users" value="" placeholder="e.g. 500" onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Revenue (User Currency)</label>
-                                <input type="number" id="inp_revenue" value="" placeholder="e.g. 20000000"
-                                    onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Total IT Cost (Local Currency)</label>
-                                <input type="number" id="inp_it_cost" value="" placeholder="e.g. 5000000"
-                                    onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Queries Processed (#)</label>
-                                <input type="number" id="inp_queries" value="" placeholder="Optional" onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Monthly Data Added (GB)</label>
-                                <input type="number" id="inp_data_added" value="" placeholder="e.g. 500"
-                                    onchange="calc()">
-                            </div>
-                            <div class="form-group">
-                                <label>Total Data Size (TB)</label>
-                                <input type="number" id="inp_total_data" value="" placeholder="e.g. 50"
-                                    onchange="calc()">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">3. Step Costs (Entered in EUR)</div>
-                        <div id="stepInputsContainer"></div>
-                    </div>
-
-                </div>
-
-                <div class="outputs-panel">
-
-                    <div class="card">
-                        <div class="card-header">
-                            Data Quality & Comparability
-                            <span class="score-badge" id="out_score">Score: 0/5</span>
-                        </div>
-                        <p style="font-size: 13px;" id="out_score_text"></p>
-                        <div id="alerts_container"></div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            Key Performance Indicators (EUR normalized)
-                            <div>
-                                <button class="btn btn-outline btn-small" onclick="exportCsv()">Export CSV</button>
-                                <button class="btn btn-outline btn-small" onclick="exportJson()">Export JSON</button>
-                            </div>
-                        </div>
-                        <div class="grid-5" style="margin-bottom: 20px;">
-                            <div class="kpi-box">
-                                <div class="kpi-title">Total BI Cost</div>
-                                <div class="kpi-value" id="kpi_total">€0</div>
-                            </div>
-                            <div class="kpi-box">
-                                <div class="kpi-title">Data/Shipment (GB)</div>
-                                <div class="kpi-value" id="kpi_data_ship">0.00</div>
-                            </div>
-                            <div class="kpi-box">
-                                <div class="kpi-title">Cost / Shipment</div>
-                                <div class="kpi-value" id="kpi_shipment">€0.00</div>
-                            </div>
-                            <div class="kpi-box">
-                                <div class="kpi-title">Cost / Active User</div>
-                                <div class="kpi-value" id="kpi_user">€0</div>
-                            </div>
-                            <div class="kpi-box">
-                                <div class="kpi-title">% of Revenue</div>
-                                <div class="kpi-value" id="kpi_revenue">0.00%</div>
-                            </div>
-                        </div>
-
-                        <div class="grid-2">
-                            <div>
-                                <h4 style="font-size: 14px; text-align: center;">Cost Distribution (EUR & %)</h4>
-                                <canvas id="stackChart" width="300" height="250"></canvas>
-                            </div>
-                            <div>
-                                <h4 style="font-size: 14px; text-align: center;">Cost per Shipment by Step (EUR)</h4>
-                                <canvas id="barChart" width="300" height="250"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">Cost Breakdown & KPIs</div>
-                        <div style="overflow-x: auto;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Step</th>
-                                        <th class="text-right">Total Cost (EUR)</th>
-                                        <th class="text-right">% Share</th>
-                                        <th class="text-right">Cost/Shipment</th>
-                                        <th class="text-right">Cost/User</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tbl_body"></tbody>
-                                <tfoot>
-                                    <tr style="font-weight: bold; background: var(--bg-light);">
-                                        <td>Total</td>
-                                        <td class="text-right" id="tbl_tot_eur">€0</td>
-                                        <td class="text-right">100%</td>
-                                        <td class="text-right" id="tbl_tot_ship">€0.0000</td>
-                                        <td class="text-right" id="tbl_tot_user">€0.00</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="card" id="optimization_panel" style="display:none;">
-                        <div class="card-header">Optimization Opportunity</div>
-                        <div id="optimization_content"></div>
-                    </div>
-
+        <!-- VIEW: GLOBAL ARENA -->
+        <div id="v_global" class="view-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="font-size: 16px; font-weight: 600; color: var(--text-main);">Network Benchmarks</div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 13px; color: var(--text-muted);">Active Month:</span>
+                    <select id="global_month_select" class="form-control"
+                        style="width: 200px; padding: 6px; font-size: 13px;" onchange="calcGlobal()">
+                        <option value="All_Active">Current Application State</option>
+                        <!-- Populated dynamically -->
+                    </select>
                 </div>
             </div>
-            <!-- End of tab-current -->
-        </div>
 
-        <div id="tab-trends" class="tab-content">
+            <div class="grid-3" style="margin-bottom: 12px;">
+                <div class="kpi-card accent-red">
+                    <div class="kpi-label">Total BI Cost</div>
+                    <div class="kpi-value" id="glb_kpi_total">€0</div>
+                    <canvas id="spark_total" class="sparkline"></canvas>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Average Cost / Shipment</div>
+                    <div class="kpi-value" id="glb_kpi_cps">€0.00</div>
+                    <canvas id="spark_cps" class="sparkline"></canvas>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Average Cost / User</div>
+                    <div class="kpi-value" id="glb_kpi_cpu">€0.00</div>
+                    <canvas id="spark_cpu" class="sparkline"></canvas>
+                </div>
+            </div>
+
+            <div class="grid-4" style="margin-bottom: 24px;">
+                <div class="kpi-card">
+                    <div class="kpi-label">Active Application Users</div>
+                    <div class="kpi-value" id="glb_kpi_users">0</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Data Size / Shipment</div>
+                    <div class="kpi-value" id="glb_kpi_dsps">0 TB</div>
+                    <canvas id="spark_dsps" class="sparkline"></canvas>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">BI Cost vs Total IT Cost</div>
+                    <div class="kpi-value" id="glb_kpi_bivsit">0.0%</div>
+                    <canvas id="spark_bivsit" class="sparkline"></canvas>
+                </div>
+                <div class="kpi-card accent-yellow">
+                    <div class="kpi-label">Monthly Data Scaling (Trend)</div>
+                    <div class="kpi-value" id="glb_kpi_trend_diff">0.0%</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 24px;">
+                <div class="card" style="height: 400px;">
+                    <div class="card-header">Cost by Country Matrix</div>
+                    <canvas id="cvs_global_costs"></canvas>
+                </div>
+                <div class="card" style="height: 400px;">
+                    <div class="card-header">Network 24-Month Trend</div>
+                    <canvas id="cvs_global_trend"></canvas>
+                </div>
+            </div>
+
+            <!-- GLOBAL MATRIX TABLE -->
             <div class="card">
-                <div class="card-header">24-Month Data Grid</div>
+                <div class="card-header">Global Benchmark Matrix</div>
                 <div style="overflow-x: auto;">
-                    <table id="trend_grid" style="white-space: nowrap;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: right;">
                         <thead>
-                            <tr id="trend_grid_head">
-                                <!-- Generated via JS -->
+                            <tr style="border-bottom: 2px solid var(--border-light); color: var(--text-muted);">
+                                <th style="padding: 10px; text-align: left;">Country</th>
+                                <th style="padding: 10px;">Total App Cost</th>
+                                <th style="padding: 10px;">Shipments</th>
+                                <th style="padding: 10px;">Users</th>
+                                <th style="padding: 10px;">Cost / Shipment</th>
+                                <th style="padding: 10px;">Cost / User</th>
+                                <th style="padding: 10px;">Data Size / Ship</th>
+                                <th style="padding: 10px;">% of IT Budget</th>
                             </tr>
                         </thead>
-                        <tbody id="trend_grid_body">
-                            <!-- Generated via JS -->
+                        <tbody id="global_matrix_tbody">
+                            <!-- Populated by JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
+        </div>
 
-            <div class="card">
-                <div class="card-header">Monthly KPI Trends</div>
-                <div class="grid-2">
-                    <div>
-                        <h4 style="font-size: 14px; text-align: center;">Total BI Cost Evolution (EUR)</h4>
-                        <canvas id="trendChartTotal" width="600" height="250"></canvas>
+        <!-- VIEW: DATA INGESTION -->
+        <div id="v_ingestion" class="view-container">
+            <div class="split-layout">
+
+                <!-- LEFT: DATA INPUT FORM -->
+                <div class="split-left">
+
+                    <div class="card" style="background: linear-gradient(135deg, rgba(255, 204, 0, 0.1) 0%, rgba(212, 5, 17, 0.05) 100%);">
+                        <div class="card-header" style="justify-content: flex-start; gap: 15px; border-bottom: none; padding-bottom: 0;">
+                            <span>📥 Excel Integration</span>
+                            <button class="btn btn-outline" style="font-size: 13px;" onclick="downloadExcelTemplate()">Download Template</button>
+                            <input type="file" id="inp_excel_upload" accept=".xlsx, .xls" style="display: none;" onchange="uploadExcelData(event)">
+                            <button class="btn" style="background: var(--dhl-red); color: white; border: none; font-size: 13px;" onclick="document.getElementById('inp_excel_upload').click()">Upload Excel Data</button>
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 15px; margin-bottom: 0;">
+                            Download the blank `.xlsx` template, fill in the 24-month horizon data offline, and bulk-upload it to instantly populate your Country's grid without manual typing.
+                        </p>
                     </div>
-                    <div>
-                        <h4 style="font-size: 14px; text-align: center;">Cost per Shipment Evolution (EUR)</h4>
-                        <canvas id="trendChartShipment" width="600" height="250"></canvas>
+
+                    <div class="card">
+                        <div class="card-header">1. Context & Scope</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Managing Country</label>
+                                <input type="text" class="form-input" id="inp_ingest_country" readonly
+                                    style="background: var(--bg-body); cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Review Period</label>
+                                <input type="month" class="form-input" id="inp_ingest_month">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">2. Business Drivers (Monthly)</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Review Month Shipments</label>
+                                <input type="number" id="inp_ingest_shipments" class="form-input"
+                                    placeholder="e.g. 50000" oninput="calcPreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Total Shipments (Aggregated)</label>
+                                <input type="number" id="inp_ingest_total_shipments" class="form-input"
+                                    placeholder="e.g. 500000" oninput="calcPreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Active Users</label>
+                                <input type="number" id="inp_ingest_users" class="form-input" placeholder="e.g. 250"
+                                    oninput="calcPreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Revenue (€)</label>
+                                <input type="number" id="inp_ingest_revenue" class="form-input"
+                                    placeholder="e.g. 1000000" oninput="calcPreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Queries (#)</label>
+                                <input type="number" id="inp_ingest_queries" class="form-input" placeholder="e.g. 15000"
+                                    oninput="calcPreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Data Added (GB)</label>
+                                <input type="number" id="inp_ingest_data_added" class="form-input"
+                                    placeholder="e.g. 150" oninput="calcPreview()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Total Data Size (TB)</label>
+                                <input type="number" id="inp_ingest_total_data" class="form-input"
+                                    placeholder="e.g. 4.5" oninput="calcPreview()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">3. Pipeline Financials (EUR)</div>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">Input total monthly
+                            centralized costs for each tier of the data architecture.</p>
+
+                        <!-- Dynamic Step Generation Zone -->
+                        <div id="ingest_steps_container"></div>
+                    </div>
+
+                    <div class="card" style="overflow-x: auto;">
+                        <div class="card-header" style="font-size: 14px;">4. Historical Array (24-Month Horizon)</div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Fill out historical
+                            metrics. Ensure consistency with the month being edited.</p>
+                        <table id="trend_grid"
+                            style="width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap;">
+                            <thead>
+                                <tr id="trend_grid_head"></tr>
+                            </thead>
+                            <tbody id="trend_grid_body"></tbody>
+                        </table>
                     </div>
                 </div>
-                <div style="margin-top:20px;">
-                    <h4 style="font-size: 14px; text-align: center;">Data Added per Shipment (GB)</h4>
-                    <canvas id="trendChartDataShipment" width="1200" height="250"></canvas>
+
+                <!-- RIGHT: LIVE PREVIEW & SAVE -->
+                <div class="split-right">
+                    <div class="card" style="background: #FAFBFC;">
+                        <div class="card-header">Live Output Analysis</div>
+
+                        <div style="margin-bottom: 25px;">
+                            <div
+                                style="font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">
+                                Total Monthly Run Rate</div>
+                            <div style="font-size: 32px; font-weight: 700; color: var(--dhl-red);" id="out_live_total">
+                                €0</div>
+                        </div>
+
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-light); padding-bottom: 5px;">
+                            <span style="font-size: 13px; font-weight: 500;">Cost per Shipment</span>
+                            <span style="font-size: 13px; font-weight: 700;" id="out_live_cps">€0.00</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-light); padding-bottom: 5px;">
+                            <span style="font-size: 13px; font-weight: 500;">Cost per User</span>
+                            <span style="font-size: 13px; font-weight: 700;" id="out_live_cpu">€0.00</span>
+                        </div>
+                        <div
+                            style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid var(--border-light); padding-bottom: 5px;">
+                            <span style="font-size: 13px; font-weight: 500;">Data Quality Score</span>
+                            <span style="font-size: 13px; font-weight: 700; color: var(--chart-1);"
+                                id="out_live_score">0 / 5</span>
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 12px;"
+                            onclick="saveStateToLocal()">Save Country State →</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VIEW: MASTERDATA EXPLORER -->
+        <div id="v_master" class="view-container">
+            <div class="card">
+                <div class="card-header">System Settings & Data Dictionary</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Review the foundational
+                    architecture definitions and manage global data states.</p>
+
+                <div class="grid-2">
+                    <!-- Export Actions -->
+                    <div
+                        style="background: var(--bg-body); padding: 20px; border-radius: 8px; border: 1px solid var(--border-light);">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">Data Portability</h3>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Export your complete
+                            localized or global state as JSON for backup, or pull CSV extracts for external BI tools.
+                        </p>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" onclick="exportJson()">Export Global Platform JSON</button>
+                            <button class="btn btn-outline" onclick="exportCsv()">Export Active Data to CSV</button>
+                            <button class="btn btn-outline" style="border-color: var(--dhl-red); color: var(--dhl-red);"
+                                onclick="seedMockData()">Seed Global Mock Data</button>
+                        </div>
+                    </div>
+
+                    <!-- Glossary List -->
+                    <div
+                        style="background: var(--bg-body); padding: 20px; border-radius: 8px; border: 1px solid var(--border-light); max-height: 300px; overflow-y: auto;">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">Architecture Dictionary</h3>
+                        <div id="master_dict_container" style="font-size: 12px;">
+                            <!-- populated by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-    </div>
+        <!-- VIEW: FRAMEWORK GUIDANCE -->
+        <div id="v_guidance" class="view-container active">
+            <div class="card"
+                style="background: linear-gradient(135deg, #1E202B 0%, #2A2E3D 100%); color: white; border: none;">
+                <div
+                    style="font-size: 20px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <div class="brand-accent"></div> How the DHL eCommerce BI Costing Framework Works
+                </div>
+                <p style="font-size: 14px; opacity: 0.8; line-height: 1.5; max-width: 800px;">
+                    This framework provides a standardized methodology to capture, align, and benchmark the Total Cost
+                    of Ownership (TCO) for Business Intelligence across the global network. It transforms raw IT
+                    spending into actionable business metrics like <b>Cost per Shipment</b>.
+                </p>
+            </div>
+
+            <div class="grid-2">
+                <!-- Architecture Glossary Tabs -->
+                <div class="card">
+                    <div class="card-header">The 6-Step Data Pipeline</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+                        Click on each architectural step below to understand how to locate and split its costs from your
+                        Cloud Bill.
+                    </p>
+
+                    <div style="display: flex; gap: 10px; border-bottom: 1px solid var(--border-light); margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px;"
+                        id="guidance-tabs">
+                        <button class="btn btn-outline" onclick="openGuidanceTab('t_int', this)"
+                            style="background: var(--dhl-red); color: white; border-radius: 4px; padding: 6px 12px; font-size: 12px;">A.
+                            Integration</button>
+                        <button class="btn btn-outline" onclick="openGuidanceTab('t_str', this)"
+                            style="border-radius: 4px; padding: 6px 12px; font-size: 12px;">B. Storage</button>
+                        <button class="btn btn-outline" onclick="openGuidanceTab('t_pro', this)"
+                            style="border-radius: 4px; padding: 6px 12px; font-size: 12px;">C. Processing</button>
+                        <button class="btn btn-outline" onclick="openGuidanceTab('t_ana', this)"
+                            style="border-radius: 4px; padding: 6px 12px; font-size: 12px;">D. Analytics</button>
+                        <button class="btn btn-outline" onclick="openGuidanceTab('t_gov', this)"
+                            style="border-radius: 4px; padding: 6px 12px; font-size: 12px;">E. Governance</button>
+                        <button class="btn btn-outline" onclick="openGuidanceTab('t_ops', this)"
+                            style="border-radius: 4px; padding: 6px 12px; font-size: 12px;">F. Operations</button>
+                    </div>
+
+                    <div id="t_int" class="guidance-tab" style="display: block;">
+                        <h3
+                            style="font-size: 15px; margin-bottom: 15px; border-left: 4px solid var(--chart-1); padding-left: 10px;">
+                            A. Integration (ETL / Event Hubs)</h3>
+                        <div style="margin-bottom: 20px; text-align: center;">
+                            <img src="assets/dhl_integration_pipe_1773242797645.png" alt="Data Integration" style="max-height: 240px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <b>Definition:</b> The process and compute required to move data from operational systems
+                            (like ERPs, CRMs, or external APIs) into the analytics environment.<br><br>
+                            <b>How to Identify in your Bill:</b> Look for services like <i>Azure Data Factory, Azure
+                                Event Hubs, GCP Dataflow, AWS Glue, Talend, or Informatica Cloud</i>. Only include the
+                            compute costs associated with data movement and ingestion pipelines.<br><br>
+                            <b style="color:var(--text-main);">👨‍💻 FTE / Human Capital Mapping:</b> Include salaries
+                            for **Data Engineers, Data Integrators, and ETL Developers** here.
+                        </p>
+                    </div>
+
+                    <div id="t_str" class="guidance-tab" style="display: none;">
+                        <h3
+                            style="font-size: 15px; margin-bottom: 15px; border-left: 4px solid var(--chart-2); padding-left: 10px;">
+                            B. Storage (Data Lakes / Warehouses)</h3>
+                        <div style="margin-bottom: 20px; text-align: center;">
+                            <img src="assets/dhl_storage_pipe_1773242813535.png" alt="Cloud Data Storage" style="max-height: 240px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <b>Definition:</b> The physical or logical environments where raw, curated, and modeled data
+                            rests natively.<br><br>
+                            <b>How to Identify in your Bill:</b> The baseline storage tiers of <i>Azure Data Lake (ADLS
+                                Gen2), Amazon S3, Google Cloud Storage, or Snowflake</i>. Note: This is purely storage
+                            capacity (Terabytes per month), separate from the compute used to query it.<br><br>
+                            <b style="color:var(--text-main);">👨‍💻 FTE / Human Capital Mapping:</b> Include salaries
+                            for **Database Administrators (DBAs) and Storage/Infrastructure Engineers** here.
+                        </p>
+                    </div>
+
+                    <div id="t_pro" class="guidance-tab" style="display: none;">
+                        <h3
+                            style="font-size: 15px; margin-bottom: 15px; border-left: 4px solid var(--chart-3); padding-left: 10px;">
+                            C. Processing (Compute / SQL Engines)</h3>
+                        <div style="margin-bottom: 20px; text-align: center;">
+                            <img src="assets/dhl_processing_pipe_1773242828403.png" alt="Data Processing" style="max-height: 240px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <b>Definition:</b> The compute power required to execute queries, transform data (ETL/ELT),
+                            and train machine learning models.<br><br>
+                            <b>How to Identify in your Bill:</b> Look for heavy compute resources like <i>Databricks,
+                                Azure Synapse dedicated SQL pools (Compute tier), Google BigQuery (Analysis/Compute
+                                tier), Snowflake (Warehouses), or Spark clusters</i>.<br><br>
+                            <b style="color:var(--text-main);">👨‍💻 FTE / Human Capital Mapping:</b> Include salaries
+                            for heavy compute developers: **Analytics Engineers (dbt experts) and Data Scientists**
+                            training models here.
+                        </p>
+                    </div>
+
+                    <div id="t_ana" class="guidance-tab" style="display: none;">
+                        <h3
+                            style="font-size: 15px; margin-bottom: 15px; border-left: 4px solid var(--chart-4); padding-left: 10px;">
+                            D. Analytics & Consumption (BI Tools)</h3>
+                        <div style="margin-bottom: 20px; text-align: center;">
+                            <img src="assets/dhl_analytics_pipe_1773242861571.png" alt="Data Analytics" style="max-height: 240px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <b>Definition:</b> Frontend BI platforms, ad-hoc query tools, or embedded portals where
+                            users actually consume the insights.<br><br>
+                            <b>How to Identify in your Bill:</b> Software licensing and premium capacities for
+                            <i>PowerBI Premium/Pro, Tableau Cloud, Qlik, Looker, or custom frontend web app
+                                hosting</i>.<br><br>
+                            <b style="color:var(--text-main);">👨‍💻 FTE / Human Capital Mapping:</b> Include salaries
+                            strictly for the frontend builders: **BI Developers, PowerBI Dashboarders, and Data
+                            Analysts**.
+                        </p>
+                    </div>
+
+                    <div id="t_gov" class="guidance-tab" style="display: none;">
+                        <h3
+                            style="font-size: 15px; margin-bottom: 15px; border-left: 4px solid var(--chart-5); padding-left: 10px;">
+                            E. Governance (Security & Cataloging)</h3>
+                        <div style="margin-bottom: 20px; text-align: center;">
+                            <img src="assets/dhl_governance_pipe_1773242876734.png" alt="Data Governance" style="max-height: 240px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <b>Definition:</b> Enforcing data security, managing access control, and operating data
+                            catalogs/lineage tools.<br><br>
+                            <b>How to Identify in your Bill:</b> Identity management (Azure AD B2C for analytics
+                            portals), <i>Azure Purview, Collibra, Alation, or specific Secrets/Key Vault usage</i> tied
+                            directly to the BI team.<br><br>
+                            <b style="color:var(--text-main);">👨‍💻 FTE / Human Capital Mapping:</b> Include
+                            overarching salaries for **Data Architects, Data Stewards, and Compliance Officers** here.
+                        </p>
+                    </div>
+
+                    <div id="t_ops" class="guidance-tab" style="display: none;">
+                        <h3
+                            style="font-size: 15px; margin-bottom: 15px; border-left: 4px solid var(--chart-6); padding-left: 10px;">
+                            F. Operations (Orchestration & DevOps)</h3>
+                        <div style="margin-bottom: 20px; text-align: center;">
+                            <img src="assets/dhl_operations_pipe_1773242895475.png" alt="Data Operations" style="max-height: 240px; border-radius: 8px; box-shadow: var(--shadow-sm);">
+                        </div>
+                        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <b>Definition:</b> Triggering workflows, monitoring pipeline health, and deploying
+                            code.<br><br>
+                            <b>How to Identify in your Bill:</b> <i>Apache Airflow, Azure DevOps runners, GitHub Actions
+                                (billed minutes), Azure Monitor / Log Analytics environments</i> strictly related to the
+                            BI resource group.<br><br>
+                            <b style="color:var(--text-main);">👨‍💻 FTE / Human Capital Mapping:</b> Include
+                            overarching operational salaries for **DevOps Engineers, Platform Admins, Scrum Masters, and
+                            L1/L2 Support**.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Dummy Calculation Example -->
+                <div class="card">
+                    <div class="card-header">Dummy Data Calculation Example</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">How a Country's raw IT
+                        cloud bill converts into a comparable business performance metric.</p>
+
+                    <div
+                        style="background: #FAFBFC; border: 1px solid var(--border-light); border-radius: 8px; padding: 20px;">
+                        <div style="margin-bottom: 15px;">
+                            <div
+                                style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+                                1. The Business Dimensions</div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 14px;">
+                                <span>Monthly Shipments Tracked:</span><b>100,000</b>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 14px;">
+                                <span>Total Active BI Users:</span><b>250</b>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 14px;">
+                                <span>Total Data Size (TB):</span><b>10 TB</b>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 14px;">
+                                <span>Broader Corporate IT Budget:</span><b>€ 2,000,000</b>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 15px; border-top: 1px solid var(--border-light); padding-top: 15px;">
+                            <div
+                                style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+                                2. The Cloud Bill (Allocated to Steps)</div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px;">
+                                <span>A. Integration (Azure Data Factory)</span><span>€ 5,000</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px;">
+                                <span>B. Storage (Azure Data Lake)</span><span>€ 8,000</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px;">
+                                <span>C. Processing (Databricks)</span><span>€ 15,000</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px;">
+                                <span>D. Analytics (Power BI Premium)</span><span>€ 10,000</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 13px;">
+                                <span>E. Governance + F. Operations</span><span>€ 2,000</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 16px; font-weight: 700; color: var(--dhl-red);">
+                                <span>Total Monthly IT Run Rate:</span><span>€ 40,000</span>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid var(--border-light); padding-top: 15px;">
+                            <div
+                                style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px;">
+                                3. The Final Standardized KPIs</div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div
+                                    style="background: var(--bg-body); padding: 15px; border-radius: 6px; text-align: center; border: 1px solid var(--border-light);">
+                                    <div style="font-size: 12px; margin-bottom: 5px; color: var(--text-muted);">Cost per
+                                        Shipment<br>(€40k BI Cost ÷ 100k Shipments)</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-main);">€0.40</div>
+                                </div>
+                                <div
+                                    style="background: var(--bg-body); padding: 15px; border-radius: 6px; text-align: center; border: 1px solid var(--border-light);">
+                                    <div style="font-size: 12px; margin-bottom: 5px; color: var(--text-muted);">Cost per
+                                        Application User<br>(€40k BI Cost ÷ 250 Users)</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-main);">€160.00
+                                    </div>
+                                </div>
+                                <div
+                                    style="background: var(--bg-body); padding: 15px; border-radius: 6px; text-align: center; border: 1px solid var(--border-light);">
+                                    <div style="font-size: 12px; margin-bottom: 5px; color: var(--text-muted);">Data
+                                        Size per Shipment<br>(10 TB ÷ 100k Shipments)</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-main);">0.0001 TB
+                                    </div>
+                                </div>
+                                <div
+                                    style="background: var(--bg-body); padding: 15px; border-radius: 6px; text-align: center; border: 1px solid var(--border-light);">
+                                    <div style="font-size: 12px; margin-bottom: 5px; color: var(--text-muted);">BI Cost
+                                        vs Total IT Cost<br>(€40k BI Cost ÷ €2M Total Budget)</div>
+                                    <div style="font-size: 18px; font-weight: 700; color: var(--text-main);">2.0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Quality Explainer -->
+                <div class="card" style="margin-top: 20px;">
+                    <div class="card-header">Data Quality & Comparability Rubric</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Understanding how the
+                        Platform calculates the /5 Confidence Score for each Country profile.</p>
+
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">1. Shipment Volume Provided</label>
+                        <div class="input-help">+1 Point if the Country has provided reliable target Shipments (the core
+                            denominator for Cost per Shipment standardisation).</div>
+                    </div>
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">2. Active Users Logged</label>
+                        <div class="input-help">+1 Point if the Country has provided Active BI Application Users
+                            (crucial for evaluating pure application scaling costs).</div>
+                    </div>
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">3. Cloud Cost Breakdown Accuracy</label>
+                        <div class="input-help">+1 Point if costs are mapped specifically to architectural steps rather
+                            than dumped as a single aggregate number. Missing 3 or more structural layers fails this
+                            check.</div>
+                    </div>
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">4. 24-Month Historical Horizon</label>
+                        <div class="input-help">+1 Point if the Country has entered trend data for at least 6 months
+                            inside the 2025/2026 Grid, enabling forecasting analysis.</div>
+                    </div>
+                    <div class="input-group" style="background:var(--section-bg); padding:15px; border-radius:6px;">
+                        <label style="font-size:14px;">5. Metric Comprehension Alignment</label>
+                        <div class="input-help">+1 Point if advanced driver inputs (Queries, Revenue, TB Size) are
+                            consistently tracked.</div>
+                    </div>
+                </div>
+
+                <!-- NEW: KPI DEFINITIONS DICTIONARY -->
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header">Core KPI Definitions & Optimization Levers</div>
+                    <div class="input-help" style="margin-bottom: 20px;">
+                        The BI Costing Performance Dashboard tracks standardized metrics to compare countries impartially. Below is the
+                        operational dictionary outlining the significance and improvement strategy for each KPI.
+                    </div>
+
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px; color:var(--dhl-red);">Average Cost / Shipment</label>
+                        <div class="input-help"><b>Definition:</b> The total BI software, cloud, and FTE cost divided by
+                            the total number of physical DHL eCommerce shipments delivered in that country.<br><b>Why It
+                                Matters:</b> This is the ultimate equalizer. A massive country with a huge BI bill might
+                            actually be highly efficient on a per-shipment basis compared to a small country with a tiny
+                            BI bill.<br><b>Optimization Levers:</b> Eliminate redundant cloud storage, deprecate unused
+                            legacy reports, or increase shipment volume without scaling infrastructure linearly.</div>
+                    </div>
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">Average Cost / User</label>
+                        <div class="input-help"><b>Definition:</b> Total BI cost divided by the number of active
+                            employees utilizing the BI dashboards.<br><b>Why It Matters:</b> Reveals the licensing and
+                            compute cost of democratizing data. Extremely high cost-per-user indicates severe
+                            inefficiencies or very expensive bespoke tooling for a small audience.<br><b>Optimization
+                                Levers:</b> Audit and revoke inactive software licenses, shift from named-user to
+                            capacity-based pricing, or train more staff to utilize the existing platform (increasing the
+                            denominator).</div>
+                    </div>
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">Data Size / Shipment</label>
+                        <div class="input-help"><b>Definition:</b> The total Terabytes (TB) of data housed in the cloud
+                            divided by total shipments.<br><b>Why It Matters:</b> Indicates data bloat. Tracking too
+                            many irrelevant event pings per shipment explodes storage costs without adding operational
+                            value.<br><b>Optimization Levers:</b> Implement aggressive data retention policies, move
+                            cold data to cheaper archive storage classes, and stop duplicating tables across multiple
+                            reporting layers.</div>
+                    </div>
+                    <div class="input-group"
+                        style="background:var(--section-bg); padding:15px; border-radius:6px; margin-bottom:10px;">
+                        <label style="font-size:14px;">BI Cost vs Total IT Cost</label>
+                        <div class="input-help"><b>Definition:</b> The percentage of the country's entire IT budget
+                            consumed specifically by Business Intelligence.<br><b>Why It Matters:</b> Highlights the
+                            strategic footprint of data analytics within the local IT org. <br><b>Optimization
+                                Levers:</b> If this ratio is unsustainably high, local architects need to renegotiate
+                            vendor contracts or migrate away from fully-managed premium SaaS toward open-source
+                            self-managed tools.</div>
+                    </div>
+                    <div class="input-group" style="background:var(--section-bg); padding:15px; border-radius:6px;">
+                        <label style="font-size:14px; color:var(--chart-3);">Monthly Data Scaling (Trend)</label>
+                        <div class="input-help"><b>Definition:</b> The percentage variance in Total Cost comparing Month
+                            24 against Month 1.<br><b>Why It Matters:</b> Cloud costs inherently creep upwards. A steep
+                            positive % means costs are spiraling out of control faster than the business is
+                            growing.<br><b>Optimization Levers:</b> Implement strict FinOps alerting, mandate
+                            query-optimization standards for developers, and utilize auto-pausing/auto-scaling cloud
+                            warehouse clusters.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        // --- Data Definitions ---
+        // --- 1. CORE DATA DICTIONARY ---
         const STEPS = [
-            { id: 'integration', label: 'A. Integration', icon: '🔄', def: 'Moving data from source systems (ERP, CRM) to the analytical platform. Includes ETL/ELT pipeline tools, API connectors, message queues, and related data ingestion costs.', owners: 'Data Eng', levers: ['Incremental loads', 'Switch to ELT', 'Optimize connector schedules'] },
-            { id: 'storage', label: 'B. Storage', icon: '🗄️', def: 'Persisting data in operational data stores, data lakes, or analytical databases. Covers cost of raw storage footprints, backups, and cross-region replication.', owners: 'Cloud Ops', levers: ['Data lifecycle policies', 'Cold storage tiering', 'Compressions formats (Parquet)'] },
-            { id: 'processing', label: 'C. Processing', icon: '⚙️', def: 'The compute power required for transforming, modeling, validating, and joining data (e.g., dbt, Spark clusters, Snowflake warehouses). Often the biggest cost driver. Includes Data Engineering FTEs.', owners: 'Data Eng', levers: ['Materialized views', 'Right-size warehouse compute', 'Job optimization & indexing', 'Cache frequent queries'] },
-            { id: 'analytics', label: 'D. Analytics & Consumption', icon: '📊🌐', def: 'Frontend BI platforms (PowerBI, Tableau), custom portals, and embedded analytics. **Includes BI Developer FTEs responsible for centralized dashboard generation.**', owners: 'BI & Product', levers: ['Reclaim inactive licenses', 'Consolidate redundant dashboards', 'Use view-only tiers', 'Cache reports'] },
-            { id: 'governance', label: 'E. Governance', icon: '🛡️', def: 'Ensuring data is safe, compliant, and trustworthy. Includes data quality tooling, cataloging/lineage tools, security (Access Control, Data Loss Prevention), auditing, and compliance management.', owners: 'Data Gov & Sec', levers: ['Automate QA checks', 'Consolidate catalog tools', 'Standardize RBAC'] },
-            { id: 'operations', label: 'F. Operations', icon: '🛠️', def: 'Keeping the platform running smoothly. Covers orchestration tools (Airflow), cross-platform monitoring/alerting, and general infrastructure overhead. **Includes Platform Support & Monitoring FTEs.**', owners: 'Platform', levers: ['Automate alerting', 'Right-size orchestrator instances', 'Implement FinOps tags'] }
+            { id: 'integration', label: 'A. Integration', icon: '🔄', def: 'Moving data from source systems (ERP, CRM) to the analytical platform.' },
+            { id: 'storage', label: 'B. Storage', icon: '🗄️', def: 'Persisting data in operational data stores, data lakes, or analytical databases.' },
+            { id: 'processing', label: 'C. Processing', icon: '⚙️', def: 'The compute power required for transforming, modeling, validating, and joining data.' },
+            { id: 'analytics', label: 'D. Analytics & Consumption', icon: '📊', def: 'Frontend BI platforms (PowerBI, Tableau), custom portals, and embedded analytics.' },
+            { id: 'governance', label: 'E. Governance', icon: '🛡️', def: 'Ensuring data is safe, compliant, and trustworthy.' },
+            { id: 'operations', label: 'F. Operations', icon: '🛠️', def: 'Keeping the platform running smoothly. Orchestration, monitoring.' }
         ];
-
-        const COLORS = ['#FFCC00', '#D40511', '#4A4A4A', '#888888', '#FFEB85', '#990000', '#222222'];
 
         const GRID_ROWS = [
             { id: 'shipments', label: 'Monthly Shipments', type: 'driver' },
@@ -683,681 +1079,1025 @@
             { id: 'eur_operations', label: 'Operations (EUR)', type: 'cost' }
         ];
 
-        let trendData = [];
+        const COLORS = ['#FFCC00', '#D40511', '#4A4A4A', '#888888', '#FFEB85', '#990000', '#222222'];
 
-        // --- Init & UI Generation ---
-        function init() {
-            renderDiagram();
-            renderStepInputs();
-            loadStateFromLocal();
-            generateTrendGrid();
-            calc();
-            drawTrendCharts();
+        const COUNTRIES = [
+            'AU (Australia)', 'BNLX (Benelux)', 'CBS (Cross Border)',
+            'CZ (PPL Czech)', 'IN (Blue Dart India)', 'PL (Poland)',
+            'ES (Spain)', 'TH/MY (Thailand/Malaysia)', 'TR (Türkiye)',
+            'US (United States)', 'BRS (Global Head Office)'
+        ];
+
+        let activeContext = 'Global';
+        let trendData = []; // 24-month horizon (2025-2026)
+
+        // --- 1.5 STATE MANAGEMENT ---
+        function saveStateToLocal() {
+            if (activeContext === 'Global' || !activeContext) return;
+
+            // 1. Save Snapshot
+            let monthSel = document.getElementById('inp_ingest_month').value; // YYYY-MM
+            let shipments = document.getElementById('inp_ingest_shipments').value;
+            let total_shipments = document.getElementById('inp_ingest_total_shipments').value;
+            let users = document.getElementById('inp_ingest_users').value;
+            let revenue = document.getElementById('inp_ingest_revenue').value;
+            let queries = document.getElementById('inp_ingest_queries').value;
+            let data_added = document.getElementById('inp_ingest_data_added').value;
+            let total_data = document.getElementById('inp_ingest_total_data').value;
+
+            let state = {
+                inp_month: monthSel,
+                inp_shipments: shipments,
+                inp_total_shipments: total_shipments,
+                inp_users: users,
+                inp_revenue: revenue,
+                inp_queries: queries,
+                inp_data_added: data_added,
+                inp_total_data: total_data
+            };
+
+            let currentTotalEur = 0;
+            STEPS.forEach(s => {
+                let v = document.getElementById(`inp_eur_${s.id}`).value;
+                state[`eur_${s.id}`] = v;
+                currentTotalEur += (parseFloat(v) || 0);
+            });
+            localStorage.setItem(`bi_cost_state_${activeContext}`, JSON.stringify(state));
+
+            // 2. Map Snapshot into the appropriate Static Trend Array Slot (if month is 2025-2026)
+            if (monthSel) {
+                let [y, m] = monthSel.split('-');
+                let yearInt = parseInt(y);
+                let monthInt = parseInt(m);
+                if (yearInt >= 2025 && yearInt <= 2026) {
+                    let indexTarget = ((yearInt - 2025) * 12) + (monthInt - 1);
+
+                    // Update DOM Grid if it exists
+                    if (document.getElementById(`tr_head_${indexTarget}`)) {
+                        STEPS.forEach(s => {
+                            let el = document.getElementById(`tr_eur_${s.id}_${indexTarget}`);
+                            if (el) el.value = state[`eur_${s.id}`];
+                        });
+                        if (document.getElementById(`tr_shipments_${indexTarget}`)) document.getElementById(`tr_shipments_${indexTarget}`).value = shipments;
+                        if (document.getElementById(`tr_total_shipments_${indexTarget}`)) document.getElementById(`tr_total_shipments_${indexTarget}`).value = total_shipments;
+                        if (document.getElementById(`tr_users_${indexTarget}`)) document.getElementById(`tr_users_${indexTarget}`).value = users;
+                        if (document.getElementById(`tr_revenue_${indexTarget}`)) document.getElementById(`tr_revenue_${indexTarget}`).value = revenue;
+                        if (document.getElementById(`tr_queries_${indexTarget}`)) document.getElementById(`tr_queries_${indexTarget}`).value = queries;
+                        if (document.getElementById(`tr_data_added_${indexTarget}`)) document.getElementById(`tr_data_added_${indexTarget}`).value = data_added;
+                        if (document.getElementById(`tr_total_data_${indexTarget}`)) document.getElementById(`tr_total_data_${indexTarget}`).value = total_data;
+                        if (document.getElementById(`tr_it_cost_${indexTarget}`)) document.getElementById(`tr_it_cost_${indexTarget}`).value = currentTotalEur;
+                    }
+                }
+            }
+
+            // 3. Save Trend Array exactly as visible in the DOM grid
+            let trendState = [];
+            for (let i = 0; i < 24; i++) {
+                let mObj = {};
+                mObj.month = document.getElementById(`tr_head_${i}`) ? document.getElementById(`tr_head_${i}`).getAttribute('data-iso') : 'N/A';
+                GRID_ROWS.forEach(r => {
+                    let el = document.getElementById(`tr_${r.id}_${i}`);
+                    if (el) mObj[r.id] = parseFloat(el.value) || 0;
+                });
+                trendState.push(mObj);
+            }
+            localStorage.setItem(`bi_cost_trend_${activeContext}`, JSON.stringify(trendState));
+
+            // Reload memory array
+            trendData = trendState;
+
+            // Visual feedback
+            let btn = document.querySelector('button.btn-primary');
+            let oldText = btn.innerText;
+            btn.innerText = 'Saved Successfully ✓';
+            btn.style.background = 'var(--chart-1)';
+            setTimeout(() => {
+                btn.innerText = oldText;
+                btn.style.background = 'var(--dhl-red)';
+            }, 2000);
         }
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        function loadStateFromLocal() {
+            if (activeContext === 'Global' || !activeContext) return;
 
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            // Default reset
+            document.getElementById('inp_ingest_month').value = '2025-01';
+            document.getElementById('inp_ingest_shipments').value = '';
+            document.getElementById('inp_ingest_total_shipments').value = '';
+            document.getElementById('inp_ingest_users').value = '';
+            document.getElementById('inp_ingest_revenue').value = '';
+            document.getElementById('inp_ingest_queries').value = '';
+            document.getElementById('inp_ingest_data_added').value = '';
+            document.getElementById('inp_ingest_total_data').value = '';
+            STEPS.forEach(s => { document.getElementById(`inp_eur_${s.id}`).value = ''; });
 
-            if (tabId === 'tab-trends') {
-                // Resize charts if they were hidden during initialization
-                // trendChartTotalInstance?.resize();
-                // trendChartShipmentInstance?.resize();
+            // Load Snapshot
+            let stateStr = localStorage.getItem(`bi_cost_state_${activeContext}`);
+            if (stateStr) {
+                try {
+                    let state = JSON.parse(stateStr);
+                    document.getElementById('inp_ingest_month').value = state.inp_month || '';
+                    document.getElementById('inp_ingest_shipments').value = state.inp_shipments || '';
+                    document.getElementById('inp_ingest_total_shipments').value = state.inp_total_shipments || '';
+                    document.getElementById('inp_ingest_users').value = state.inp_users || '';
+                    document.getElementById('inp_ingest_revenue').value = state.inp_revenue || '';
+                    document.getElementById('inp_ingest_queries').value = state.inp_queries || '';
+                    document.getElementById('inp_ingest_data_added').value = state.inp_data_added || '';
+                    document.getElementById('inp_ingest_total_data').value = state.inp_total_data || '';
+                    STEPS.forEach(s => {
+                        document.getElementById(`inp_eur_${s.id}`).value = state[`eur_${s.id}`] || '';
+                    });
+                } catch (e) {
+                    console.error("Error parsing state from local storage:", e);
+                }
+            }
+
+            // Load Trend
+            const trendStr = localStorage.getItem(`bi_cost_trend_${activeContext}`);
+            if (trendStr) {
+                try {
+                    trendData = JSON.parse(trendStr);
+                } catch (e) { trendData = []; }
+            } else {
+                trendData = [];
             }
         }
 
-        function renderDiagram() {
-            const container = document.getElementById('diagramContainer');
+        function generateTrendGrid() {
+            let tHead = document.getElementById('trend_grid_head');
+            let tBody = document.getElementById('trend_grid_body');
+            if (!tHead || !tBody) return;
+
+            // Generate Static 24 Months output (Jan 2025 to Dec 2026)
+            let monthsArray = [];
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            for (let y = 2025; y <= 2026; y++) {
+                for (let m = 0; m < 12; m++) {
+                    monthsArray.push(`${y}-${(m + 1).toString().padStart(2, '0')}`);
+                }
+            }
+
+            // Headers
+            let hHtml = '<th style="text-align: left; padding: 4px; border-bottom: 2px solid var(--border-light); position: sticky; left: 0; background: white; z-index: 2;">Metric</th>';
+            monthsArray.forEach((mStr, i) => {
+                let mLabel = monthNames[parseInt(mStr.split('-')[1]) - 1] + ' ' + mStr.split('-')[0];
+                hHtml += `<th id="tr_head_${i}" style="padding: 4px; border-bottom: 2px solid var(--border-light); font-weight: 600; text-align: right;" data-iso="${mStr}">${mLabel}</th>`;
+            });
+            tHead.innerHTML = hHtml;
+
+            // Rows
+            let bHtml = '';
+            GRID_ROWS.forEach(r => {
+                bHtml += `<tr><td style="padding: 4px; font-weight: 500; border-bottom: 1px solid var(--border-light); position: sticky; left: 0; background: white; z-index: 1;">${r.label}</td>`;
+                for (let i = 0; i < 24; i++) {
+                    let val = '';
+                    if (trendData[i] && trendData[i][r.id] !== undefined) {
+                        val = trendData[i][r.id];
+                    }
+                    bHtml += `<td style="padding: 4px;"><input type="number" id="tr_${r.id}_${i}" value="${val}" style="width: 70px; padding: 4px; border: 1px solid var(--border-light); border-radius: 4px; font-size: 11px; text-align: right;" onchange="saveStateToLocal()"></td>`;
+                }
+                bHtml += '</tr>';
+            });
+            tBody.innerHTML = bHtml;
+        }
+
+        function formatEur(val, decimals = 0) {
+            return '€' + parseFloat(val).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        }
+
+        // --- 1.6 CHART ENGINE (VANILLA JS) ---
+        function clearCanvas(id) {
+            let canvas = document.getElementById(id);
+            if (!canvas) return null;
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            return { canvas, ctx };
+        }
+
+        function drawBarChart(id, labels, data, colors, isCurrency = true) {
+            let context = clearCanvas(id);
+            if (!context) return;
+            let { canvas, ctx } = context;
+
+            let paddingLeft = 40, paddingBottom = 40, paddingTop = 20, paddingRight = 10;
+            let width = canvas.width - paddingLeft - paddingRight;
+            let height = canvas.height - paddingBottom - paddingTop;
+
+            let maxVal = Math.max(...data, 1);
+            let barWidth = width / labels.length;
+
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#9BA3B5';
+            ctx.textAlign = 'right';
+
+            // Y-Axis labels
+            let steps = 4;
+            for (let i = 0; i <= steps; i++) {
+                let val = (maxVal / steps) * i;
+                let y = paddingTop + height - (height * (i / steps));
+                ctx.fillText(isCurrency ? '€' + Math.round(val / 1000) + 'k' : val, paddingLeft - 5, y + 3);
+            }
+
+            // Draw bars
+            data.forEach((val, i) => {
+                let barH = (val / maxVal) * height;
+                let x = paddingLeft + (i * barWidth) + (barWidth * 0.1);
+                let y = paddingTop + height - barH;
+                let w = barWidth * 0.8;
+
+                ctx.fillStyle = colors[i % colors.length];
+                // rounded top corners trick via paths
+                ctx.beginPath();
+                ctx.roundRect(x, y, w, barH, [4, 4, 0, 0]);
+                ctx.fill();
+
+                // X-Axis labels
+                ctx.fillStyle = '#5E6C84';
+                ctx.textAlign = 'center';
+                // push rotate
+                ctx.save();
+                ctx.translate(x + w / 2, paddingTop + height + 15);
+                ctx.rotate(-Math.PI / 6);
+                ctx.fillText(labels[i], 0, 0);
+                ctx.restore();
+            });
+        }
+
+        function drawLineChart(id, dataPoints, color) {
+            let context = clearCanvas(id);
+            if (!context) return;
+            let { canvas, ctx } = context;
+
+            if (dataPoints.length === 0) return;
+
+            let pl = 40, pb = 20, pt = 10, pr = 10;
+            let w = canvas.width - pl - pr, h = canvas.height - pb - pt;
+
+            let maxVal = Math.max(...dataPoints, 1);
+            let minVal = Math.min(...dataPoints.filter(v => v > 0), 0);
+
+            let yRange = maxVal - minVal || 1;
+            let dx = w / Math.max(1, dataPoints.length - 1);
+
+            ctx.font = '10px Inter';
+            ctx.fillStyle = '#9BA3B5';
+            ctx.textAlign = 'right';
+
+            let steps = 3;
+            for (let i = 0; i <= steps; i++) {
+                let val = minVal + (yRange / steps) * i;
+                let y = pt + h - (h * (i / steps));
+                ctx.fillText('€' + Math.round(val / 1000) + 'k', pl - 5, y + 3);
+
+                // grid line
+                ctx.beginPath(); ctx.moveTo(pl, y); ctx.lineTo(pl + w, y);
+                ctx.strokeStyle = '#DFE1E6'; ctx.stroke();
+            }
+
+            // Draw line
+            ctx.beginPath();
+            dataPoints.forEach((val, i) => {
+                let x = pl + i * dx;
+                let y = pt + h - ((val - minVal) / yRange) * h;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+
+            // Fill area under line
+            ctx.lineTo(pl + w, pt + h);
+            ctx.lineTo(pl, pt + h);
+            ctx.closePath();
+
+            let grad = ctx.createLinearGradient(0, pt, 0, pt + h);
+            // using hex color conversion generic (dhl red to transparent)
+            grad.addColorStop(0, color + '44');
+            grad.addColorStop(1, color + '00');
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
+
+        function drawSparkline(id, dataPoints, color) {
+            let context = clearCanvas(id);
+            if (!context) return;
+            let { canvas, ctx } = context;
+
+            if (dataPoints.length === 0) return;
+
+            let padding = 2;
+            let w = canvas.width - 2 * padding;
+            let h = canvas.height - 2 * padding;
+
+            let maxVal = Math.max(...dataPoints, 0.001); // Avoid division by zero if all are zero
+            let minVal = Math.min(...dataPoints, 0);
+
+            let yRange = maxVal - minVal;
+            if (yRange === 0) yRange = maxVal || 1; // Handle flat lines or all zeros
+
+            let dx = w / Math.max(1, dataPoints.length - 1);
+
+            ctx.beginPath();
+            dataPoints.forEach((val, i) => {
+                let x = padding + i * dx;
+                let y = padding + h - ((val - minVal) / yRange) * h;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+
+            // Fill area under line
+            ctx.lineTo(padding + w, padding + h);
+            ctx.lineTo(padding, padding + h);
+            ctx.closePath();
+
+            let grad = ctx.createLinearGradient(0, padding, 0, padding + h);
+            grad.addColorStop(0, color + '44');
+            grad.addColorStop(1, color + '00');
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
+
+        // --- 2. INITIALIZATION ---
+        function init() {
+            populateHeaderDropdown();
+            renderIngestionSteps();
+            renderMasterData();
+
+            // Bootstrap sequence
+            if (activeContext !== 'Global') {
+                loadStateFromLocal();
+                generateTrendGrid();
+                calcPreview();
+            }
+
+            // Defaults to Guidance
+            document.querySelector('.nav-item[onclick*="v_guidance"]').click();
+        }
+
+        // --- 3. INGESTION ENGINE ---
+        function renderIngestionSteps() {
+            const container = document.getElementById('ingest_steps_container');
             let html = '';
-            STEPS.forEach((s, i) => {
-                html += `<div class="diagram-step" id="diag_${s.id}" onclick="showStepDetail('${s.id}')">
-               <div class="diagram-icon">${s.icon}</div>
-               <div class="diagram-label">${s.label.split('.')[1]}</div>
-             </div>`;
+            STEPS.forEach(s => {
+                html += `
+                <div class="form-group" style="background: var(--bg-body); padding: 12px; border-radius: 6px; border: 1px solid var(--border-light);">
+                    <label class="form-label" style="color: var(--text-main); font-size: 14px;">${s.icon} ${s.label}</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="inp_eur_${s.id}" class="form-input" placeholder="Total EUR" oninput="calcPreview()">
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">${s.def}</div>
+                </div>
+                `;
             });
             container.innerHTML = html;
         }
 
-        function showStepDetail(id) {
-            document.querySelectorAll('.diagram-step').forEach(e => e.classList.remove('active'));
-            document.getElementById(`diag_${id}`).classList.add('active');
-            const step = STEPS.find(s => s.id === id);
-            const detail = document.getElementById('stepDetailContainer');
-            let leversHtml = step.levers.map(l => `<li>${l}</li>`).join('');
-            detail.innerHTML = `
-    <div style="display:flex; justify-content:space-between;">
-      <div>
-        <strong>${step.label}</strong><br>
-        <span style="font-size:13px; color:#666;">${step.def}</span><br>
-        <span style="font-size:12px; color:#999;">Typical Owner: ${step.owners}</span>
-      </div>
-      <div>
-        <strong style="font-size:13px;">Optimization Levers:</strong>
-        <ul class="lever-list">${leversHtml}</ul>
-      </div>
-    </div>
-  `;
-            detail.classList.add('active');
-        }
-
-        function generateTrendGrid() {
-            const now = new Date();
-            const months = [];
-            for (let i = 23; i >= 0; i--) {
-                let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                let m = d.toISOString().substring(0, 7); // YYYY-MM
-                months.push(m);
-            }
-
-            if (trendData.length !== 24) {
-                trendData = months.map(m => {
-                    let obj = { month: m };
-                    GRID_ROWS.forEach(r => obj[r.id] = 0);
-                    return obj;
-                });
-            }
-
-            let headHtml = '<th>Metric</th>';
-            months.forEach(m => headHtml += `<th>${m}</th>`);
-            document.getElementById('trend_grid_head').innerHTML = headHtml;
-
-            let bodyHtml = '';
-            GRID_ROWS.forEach(row => {
-                let tr = `<tr><td><b>${row.label}</b></td>`;
-                trendData.forEach((col, idx) => {
-                    tr += `<td><input type="number" style="width:80px; padding:4px; font-size:12px;" value="${col[row.id]}" onchange="updateTrendData(${idx}, '${row.id}', this.value)"></td>`;
-                });
-                tr += `</tr>`;
-                bodyHtml += tr;
-            });
-            document.getElementById('trend_grid_body').innerHTML = bodyHtml;
-        }
-
-        function updateTrendData(idx, field, val) {
-            trendData[idx][field] = parseFloat(val) || 0;
-            saveStateToLocal();
-            drawTrendCharts();
-        }
-
-        function drawTrendCharts() {
-            let totals = [];
-            let shipCosts = [];
-            let dataShips = [];
-
-            trendData.forEach(m => {
-                let shipments = m.shipments || 0;
-                let dataAdded = m.data_added || 0;
-                let totalEur = (m.eur_integration + m.eur_storage + m.eur_processing + m.eur_analytics + m.eur_governance + m.eur_operations) || 0;
-
-                totals.push(totalEur);
-                shipCosts.push(shipments > 0 ? (totalEur / shipments) : 0);
-                dataShips.push(shipments > 0 ? (dataAdded / shipments) : 0);
-            });
-
-            drawLineChart('trendChartTotal', totals, '#D40511'); // DHL Red
-            drawLineChart('trendChartShipment', shipCosts, '#FFCC00'); // Yellow
-            drawLineChart('trendChartDataShipment', dataShips, '#4A4A4A'); // Gray
-        }
-
-        function drawLineChart(canvasId, dataPoints, color) {
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (dataPoints.length === 0) return;
-
-            const w = canvas.width;
-            const h = canvas.height - 40;
-            const padding = 40;
-
-            let maxVal = Math.max(...dataPoints);
-            // Add 10% headroom
-            maxVal = maxVal + (maxVal * 0.1);
-            if (maxVal === 0) maxVal = 1;
-
-            const stepX = (w - padding * 2) / (dataPoints.length - 1);
-
-            // Draw axis line
-            ctx.strokeStyle = '#EAEAEA';
-            ctx.beginPath();
-            ctx.moveTo(padding, 10);
-            ctx.lineTo(padding, h);
-            ctx.lineTo(w - padding, h);
-            ctx.stroke();
-
-            // Draw Line
-            ctx.beginPath();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-
-            dataPoints.forEach((val, i) => {
-                let x = padding + (i * stepX);
-                let y = h - ((val / maxVal) * (h - 20)); // -20 for top padding
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-
-            // Draw Dots & Labels
-            ctx.textAlign = 'center';
-            dataPoints.forEach((val, i) => {
-                let x = padding + (i * stepX);
-                let y = h - ((val / maxVal) * (h - 20));
-
-                ctx.fillStyle = color;
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fill();
-
-                // X-axis label
-                if (i % 2 === 0 || i === dataPoints.length - 1) {
-                    ctx.fillStyle = '#666';
-                    ctx.font = '10px sans-serif';
-                    let shortMonth = trendData[i].month.substring(2); // "23-10"
-                    ctx.fillText(shortMonth, x, h + 15);
-                }
-            });
-        }
-
-        function renderStepInputs() {
-            const container = document.getElementById('stepInputsContainer');
-            let html = '';
-            STEPS.forEach(s => {
-
-                // Config vendor units depending on step
-                let unitLabel = 'Units';
-                if (s.id === 'processing') unitLabel = 'DBUs/Node-hours';
-                if (s.id === 'storage') unitLabel = 'GB-months';
-                if (s.id === 'analytics') unitLabel = 'License Seats';
-
-                html += `
-      <div class="step-row">
-        <div class="step-header">
-          <div class="step-title">${s.icon} ${s.label}</div>
-          <label style="margin:0; font-weight:normal;">
-            <input type="checkbox" id="chk_${s.id}" onchange="toggleMode('${s.id}')"> Use Vendor Units
-          </label>
-        </div>
-        <div class="row">
-          <div class="col" style="flex:2;">
-            <label>Direct EUR Cost</label>
-            <input type="number" id="eur_${s.id}" value="0" onchange="calc()" onkeyup="calc()">
-          </div>
-        </div>
-        <div class="mode2-inputs" id="m2_${s.id}">
-          <div class="row">
-            <div class="col">
-              <label>${unitLabel}</label>
-              <input type="number" id="u_${s.id}" value="0" onchange="calcVendor('${s.id}')" onkeyup="calcVendor('${s.id}')">
-            </div>
-            <div class="col">
-              <label>Rate per Unit (EUR)</label>
-              <input type="number" id="r_${s.id}" value="0" step="0.01" onchange="calcVendor('${s.id}')" onkeyup="calcVendor('${s.id}')">
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-            });
-
-            // Storage specific input global
-            container.innerHTML = html + `
-    <div class="step-row" style="background:#fff;">
-      <label>Global: Data Volume Stored (TB-month)</label>
-      <input type="number" id="inp_storageTB" value="" placeholder="Optional" onchange="calc()">
-    </div>
-  `;
-        }
-
-        function toggleMode(id) {
-            const isChecked = document.getElementById(`chk_${id}`).checked;
-            const m2 = document.getElementById(`m2_${id}`);
-            const eurInp = document.getElementById(`eur_${id}`);
-
-            if (isChecked) {
-                m2.classList.add('active');
-                eurInp.setAttribute('readonly', 'true');
-                calcVendor(id);
-            } else {
-                m2.classList.remove('active');
-                eurInp.removeAttribute('readonly');
-            }
-        }
-
-        function calcVendor(id) {
-            const isChecked = document.getElementById(`chk_${id}`).checked;
-            if (!isChecked) return;
-            const u = parseFloat(document.getElementById(`u_${id}`).value) || 0;
-            const r = parseFloat(document.getElementById(`r_${id}`).value) || 0;
-            const tot = u * r;
-            document.getElementById(`eur_${id}`).value = tot.toFixed(2);
-            calc();
-        }
-
-        function toggleFx() {
-            const curr = document.getElementById('inp_currency').value;
-            const fxInp = document.getElementById('inp_fx');
-            if (curr === 'EUR') {
-                fxInp.value = '1.0';
-                fxInp.setAttribute('readonly', 'true');
-            } else {
-                fxInp.removeAttribute('readonly');
-                if (parseFloat(fxInp.value) === 1.0) {
-                    // Dummy default rates if changing from EUR
-                    fxInp.value = curr === 'USD' ? '0.92' : '1.17';
-                }
-            }
-        }
-
-        // --- Calculation Engine ---
-        let computedData = {};
-
-        function calc() {
-            saveStateToLocal();
-
-            const fxRate = parseFloat(document.getElementById('inp_fx').value) || 1.0;
-            const revLocal = parseFloat(document.getElementById('inp_revenue').value) || 0;
-            const revenueEUR = revLocal * fxRate;
-
-            const shipments = parseFloat(document.getElementById('inp_shipments').value) || 0;
-            const users = parseFloat(document.getElementById('inp_users').value) || 0;
-            const queries = parseFloat(document.getElementById('inp_queries').value) || 0;
-            const strTB = parseFloat(document.getElementById('inp_storageTB').value) || 0;
-            const dataAdded = parseFloat(document.getElementById('inp_data_added').value) || 0;
-
+        function calcPreview() {
             let totalEur = 0;
-            const stepCosts = [];
+            let score = 0;
 
             STEPS.forEach(s => {
-                let eur = parseFloat(document.getElementById(`eur_${s.id}`).value) || 0;
-                // ensure no negative costs
-                if (eur < 0) { eur = 0; document.getElementById(`eur_${s.id}`).value = "0"; }
-                totalEur += eur;
-                stepCosts.push({ id: s.id, label: s.label, eur: eur });
+                let v = parseFloat(document.getElementById(`inp_eur_${s.id}`).value) || 0;
+                totalEur += v;
+                if (v > 0) score += (5 / 6); // simple dummy score allocation
             });
 
-            // KPI Calculations
-            const costPerShip = shipments > 0 ? totalEur / shipments : 0;
-            const costPerUser = users > 0 ? totalEur / users : 0;
-            const pctRev = revenueEUR > 0 ? (totalEur / revenueEUR) * 100 : 0;
+            let ships = parseFloat(document.getElementById('inp_ingest_shipments').value) || 0;
+            let users = parseFloat(document.getElementById('inp_ingest_users').value) || 0;
 
-            let procEur = stepCosts.find(x => x.id === 'processing').eur;
-            let strEur = stepCosts.find(x => x.id === 'storage').eur;
-            let anaEur = stepCosts.find(x => x.id === 'analytics').eur;
+            let cps = ships > 0 ? (totalEur / ships) : 0;
+            let cpu = users > 0 ? (totalEur / users) : 0;
 
-            const procPerQuery = queries > 0 ? procEur / queries : 0;
-            const strPerTB = strTB > 0 ? strEur / strTB : 0;
-            const dataPerShip = shipments > 0 ? dataAdded / shipments : 0;
+            document.getElementById('out_live_total').innerText = formatEur(totalEur, 0);
+            document.getElementById('out_live_cps').innerText = formatEur(cps, 4);
+            document.getElementById('out_live_cpu').innerText = formatEur(cpu, 2);
 
-            // Render KPIs
-            document.getElementById('kpi_total').innerText = formatEur(totalEur, 0);
-            document.getElementById('kpi_shipment').innerText = formatEur(costPerShip, 4);
-            document.getElementById('kpi_user').innerText = formatEur(costPerUser, 2);
-            document.getElementById('kpi_data_ship').innerText = dataPerShip.toFixed(6);
-            document.getElementById('kpi_revenue').innerText = pctRev.toFixed(3) + '%';
+            let finalScore = Math.min(5, Math.ceil(score));
+            let scoreEl = document.getElementById('out_live_score');
+            scoreEl.innerText = `${finalScore} / 5`;
 
-            // Render Table
-            let tblHtml = '';
-            stepCosts.forEach(s => {
-                const pct = totalEur > 0 ? (s.eur / totalEur) * 100 : 0;
-                const s_ship = shipments > 0 ? s.eur / shipments : 0;
-                const s_usr = users > 0 ? s.eur / users : 0;
-                tblHtml += `<tr>
-      <td>${s.label}</td>
-      <td class="text-right">${formatEur(s.eur, 0)}</td>
-      <td class="text-right">${pct.toFixed(1)}%</td>
-      <td class="text-right">${formatEur(s_ship, 4)}</td>
-      <td class="text-right">${formatEur(s_usr, 2)}</td>
-    </tr>`;
-            });
-            document.getElementById('tbl_body').innerHTML = tblHtml;
-            document.getElementById('tbl_tot_eur').innerText = formatEur(totalEur, 0);
-            document.getElementById('tbl_tot_ship').innerText = formatEur(costPerShip, 4);
-            document.getElementById('tbl_tot_user').innerText = formatEur(costPerUser, 2);
-
-            // Scoring Module
-            let score = 5;
-            let missing = 0;
-            if (totalEur === 0) { score = 1; }
-            else if (shipments === 0) { score = 1; }
-            else {
-                if (!revenueEUR) missing++;
-                if (!users) missing++;
-                if (!queries) missing++;
-                if (!strTB) missing++;
-
-                if (missing >= 3) score = 2;
-                else if (missing === 2) score = 3;
-                else if (missing === 1) score = 4;
-            }
-
-            let scBadge = document.getElementById('out_score');
-            scBadge.innerText = `Score: ${score}/5`;
-            if (score >= 4) scBadge.style.background = '#00875A'; // green
-            else if (score === 3) scBadge.style.background = 'var(--dhl-yellow)';
-            else scBadge.style.background = 'var(--dhl-red)';
-            scBadge.style.color = score >= 4 ? '#fff' : '#fff';
-            if (score === 3) scBadge.style.color = '#333';
-
-            let scText = '';
-            if (score === 5) scText = 'Perfect data completeness. KPIs are highly comparable across countries.';
-            if (score === 4) scText = 'Good completeness. Provide optional metrics (Queries or TB Store) to unlock detailed tech KPIs.';
-            if (score === 3) scText = 'Medium comparability. Missing primary business drivers (Revenue or Users).';
-            if (score <= 2) scText = 'Low comparability. Please populate basic drivers (Shipments, revenue, users).';
-            document.getElementById('out_score_text').innerText = scText;
-
-            // Advanced Alerts & Levers
-            const alertsContainer = document.getElementById('alerts_container');
-            let alertsHtml = '';
-
-            if (users > 0 && document.getElementById('chk_analytics').checked) {
-                let seats = parseFloat(document.getElementById('u_analytics').value) || 0;
-                if (seats > 0) {
-                    let util = (users / seats) * 100;
-                    if (util < 50) alertsHtml += `<div class="alert alert-warning"><b>License Utilization Risk:</b> Only ${util.toFixed(1)}% of paid Analytics seats are actively used.</div>`;
-                }
-            }
-
-            const procPct = totalEur > 0 ? (procEur / totalEur) : 0;
-            const strPct = totalEur > 0 ? (strEur / totalEur) : 0;
-            if ((procPct + strPct) > 0.60) {
-                alertsHtml += `<div class="alert alert-danger"><b>Architecture Inefficiency Risk:</b> Processing & Storage consume >60% of total BI cost. Check for monolithic data modeling or missing aggregate layers.</div>`;
-            }
-
-            alertsContainer.innerHTML = alertsHtml;
-
-            // Optimization Box
-            const optPanel = document.getElementById('optimization_panel');
-            const optContent = document.getElementById('optimization_content');
-            let highestStep = stepCosts.reduce((max, obj) => obj.eur > max.eur ? obj : max, { eur: -1 });
-
-            if (totalEur > 0 && highestStep.eur / totalEur > 0.35) {
-                optPanel.style.display = 'block';
-                let stObj = STEPS.find(x => x.id === highestStep.id);
-                let levBullets = stObj.levers.map(l => `<li>${l}</li>`).join('');
-                optContent.innerHTML = `
-        <p><b>${stObj.label}</b> is consuming <b>${((highestStep.eur / totalEur) * 100).toFixed(1)}%</b> of total costs, exceeding the typical 35% threshold.</p>
-        <p><b>Suggested Levers:</b></p>
-        <ul class="lever-list">${levBullets}</ul>
-      `;
-            } else {
-                optPanel.style.display = 'none';
-            }
-
-            // Draw charts
-            drawStackedBar(stepCosts, totalEur);
-            drawBarChart(stepCosts, shipments, totalEur);
-
-            // Expose computed data for export
-            computedData = {
-                metadata: {
-                    country: document.getElementById('inp_country').value,
-                    month: document.getElementById('inp_month').value,
-                    currency: document.getElementById('inp_currency').value,
-                    fxRate: fxRate,
-                    timestamp: new Date().toISOString()
-                },
-                inputs: {
-                    shipments, totalShipments, users, revenueLocal: revLocal, itCostLocal, queries, storageTB: strTB, dataAdded, totalDataTB
-                },
-                costs: stepCosts,
-                kpis: {
-                    totalEur, costPerShip, costPerUser, pctRev, pctItCost, procPerQuery, strPerTB, dataPerShip, score
-                }
-            };
+            if (finalScore >= 4) scoreEl.style.color = 'var(--chart-1)';
+            else if (finalScore >= 2) scoreEl.style.color = 'var(--dhl-yellow)';
+            else scoreEl.style.color = 'var(--dhl-red)';
         }
 
-        // --- Chart Rendering (Canvas) ---
-        function drawStackedBar(costs, total) {
-            const canvas = document.getElementById('stackChart');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (total === 0) return;
+        // --- 4. DASHBOARD RENDERERS ---
+        function calcCountry() {
+            if (activeContext === 'Global' || !activeContext) return;
 
-            const barHeight = 40;
-            const startY = 50;
-            let currentX = 0;
-            const width = canvas.width - 40;
+            // 1. Snapshot KPIs
+            let totalEur = 0;
+            let score = 0;
+            let stepData = [];
+            let stepLabels = [];
 
-            // Draw segments
-            costs.forEach((c, i) => {
-                let w = (c.eur / total) * width;
-                ctx.fillStyle = COLORS[i % COLORS.length];
-                ctx.fillRect(20 + currentX, startY, w, barHeight);
-                currentX += w;
+            STEPS.forEach(s => {
+                let v = parseFloat(document.getElementById(`inp_eur_${s.id}`).value) || 0;
+                totalEur += v;
+                stepData.push(v);
+                stepLabels.push(s.label.substring(0, 5) + '...');
+                if (v > 0) score += (5 / 6);
             });
 
-            // Legend
-            let lgY = 120;
-            costs.forEach((c, i) => {
-                if (c.eur === 0) return;
-                let col = i % 2 === 0 ? 20 : 160;
-                let rr = Math.floor(i / 2) * 20;
-                ctx.fillStyle = COLORS[i % COLORS.length];
-                ctx.fillRect(col, lgY + rr, 12, 12);
-                ctx.fillStyle = '#333';
-                ctx.font = '10px sans-serif';
-                ctx.fillText(`${c.label.substring(3)} (${((c.eur / total) * 100).toFixed(1)}%)`, col + 18, lgY + rr + 10);
-            });
-        }
+            let ships = parseFloat(document.getElementById('inp_ingest_shipments').value) || 0;
+            let users = parseFloat(document.getElementById('inp_ingest_users').value) || 0;
+            let cps = ships > 0 ? (totalEur / ships) : 0;
+            let cpu = users > 0 ? (totalEur / users) : 0;
 
-        function drawBarChart(costs, shipments, total) {
-            const canvas = document.getElementById('barChart');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (total === 0 || shipments === 0) return;
+            document.getElementById('cnt_kpi_total').innerText = formatEur(totalEur, 0);
+            document.getElementById('cnt_kpi_cps').innerText = formatEur(cps, 4);
+            document.getElementById('cnt_kpi_cpu').innerText = formatEur(cpu, 2);
 
-            const w = canvas.width;
-            const h = canvas.height - 40;
+            let finalScore = Math.min(5, Math.ceil(score));
+            let scoreEl = document.getElementById('cnt_kpi_score');
+            scoreEl.innerText = `${finalScore} / 5`;
+            scoreEl.style.color = finalScore >= 4 ? 'var(--chart-1)' : (finalScore >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
 
-            // Find max cost per ship
-            let maxCPS = Math.max(...costs.map(c => c.eur / shipments));
-            if (maxCPS === 0) return;
+            // 2. Snapshot Charts
+            drawBarChart('cvs_country_steps', stepLabels, stepData, COLORS);
 
-            const barWidth = (w - 40) / costs.length;
+            // Distribution "Pie" simulation (Vanilla Canvas Ring)
+            let drawRing = () => {
+                let cvs = document.getElementById('cvs_country_dist');
+                if (!cvs) return;
+                let ctx = cvs.getContext('2d');
+                ctx.clearRect(0, 0, cvs.width, cvs.height);
+                if (totalEur === 0) return;
 
-            costs.forEach((c, i) => {
-                let cps = c.eur / shipments;
-                let barH = (cps / maxCPS) * (h - 40);
-                ctx.fillStyle = COLORS[i % COLORS.length];
-                ctx.fillRect(20 + (i * barWidth) + 5, h - barH, barWidth - 10, barH);
+                let cx = cvs.width / 2, cy = cvs.height / 2, r = Math.min(cx, cy) - 20;
+                let startAngle = -0.5 * Math.PI;
+                let legHtml = '';
 
-                // label
-                ctx.fillStyle = '#666';
-                ctx.font = '9px sans-serif';
-                ctx.textAlign = 'center';
-                let shortName = c.label.split(' ')[1].substring(0, 4);
-                ctx.fillText(shortName, 20 + (i * barWidth) + (barWidth / 2), h + 15);
+                stepData.forEach((v, i) => {
+                    if (v <= 0) return;
+                    let sliceAngle = (v / totalEur) * 2 * Math.PI;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
+                    ctx.fillStyle = COLORS[i % COLORS.length];
+                    ctx.fill();
+                    startAngle += sliceAngle;
 
-                // value
-                ctx.fillStyle = '#333';
-                if (barH > 15) {
-                    ctx.fillText(cps.toFixed(4), 20 + (i * barWidth) + (barWidth / 2), h - barH - 5);
-                }
-            });
-        }
-
-        // --- Utils ---
-        function formatEur(val, dec) {
-            return new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', minimumFractionDigits: dec, maximumFractionDigits: dec }).format(val);
-        }
-
-        // --- Scenarios & State Mgmt ---
-        function loadExample(type) {
-            resetForm(false);
-
-            // Default active driver bounds for most examples
-            document.getElementById('inp_shipments').value = 5000000;
-            document.getElementById('inp_users').value = 500;
-            document.getElementById('inp_revenue').value = 25000000;
-            document.getElementById('inp_queries').value = 200000;
-            document.getElementById('inp_storageTB').value = 50;
-            document.getElementById('inp_data_added').value = 500;
-
-            if (type === 'balanced') {
-                document.getElementById('eur_integration').value = 2000;
-                document.getElementById('eur_storage').value = 3000;
-                document.getElementById('eur_processing').value = 8000;
-                document.getElementById('eur_analytics').value = 8000;
-                document.getElementById('eur_governance').value = 1500;
-                document.getElementById('eur_operations').value = 2500;
-            }
-            else if (type === 'processing') {
-                document.getElementById('inp_queries').value = 1500000;
-                document.getElementById('inp_data_added').value = 1500;
-                document.getElementById('eur_integration').value = 3000;
-                document.getElementById('eur_storage').value = 6000;
-                document.getElementById('eur_processing').value = 35000;
-                document.getElementById('eur_analytics').value = 5000;
-                document.getElementById('eur_governance').value = 500;
-                document.getElementById('eur_operations').value = 2000;
-            }
-            else if (type === 'license') {
-                document.getElementById('inp_users').value = 100; // active is low
-                document.getElementById('chk_analytics').checked = true;
-                toggleMode('analytics');
-                document.getElementById('u_analytics').value = 1000; // 1000 seats paid
-                document.getElementById('r_analytics').value = 45; // 45 EUR per seat
-
-                document.getElementById('eur_integration').value = 2000;
-                document.getElementById('eur_storage').value = 2000;
-                document.getElementById('eur_processing').value = 4000;
-                // Consumption costs stripped or ignored because Analytics is locked via units
-                document.getElementById('eur_governance').value = 1000;
-                document.getElementById('eur_operations').value = 1500;
-            }
-            else if (type === 'storage') {
-                document.getElementById('inp_storageTB').value = 5000; // Huge data lake
-                document.getElementById('inp_data_added').value = 10000;
-                document.getElementById('eur_integration').value = 4000;
-                document.getElementById('eur_storage').value = 45000;
-                document.getElementById('eur_processing').value = 3000;
-                document.getElementById('eur_analytics').value = 2500;
-                document.getElementById('eur_governance').value = 1000;
-                document.getElementById('eur_operations').value = 3000;
-            }
-            else if (type === 'sprawl') {
-                document.getElementById('inp_users').value = 1500;
-                document.getElementById('eur_integration').value = 5000;
-                document.getElementById('eur_storage').value = 8000;
-                document.getElementById('eur_processing').value = 22000;
-                document.getElementById('eur_analytics').value = 40000;
-                document.getElementById('eur_governance').value = 2000;
-                document.getElementById('eur_operations').value = 30000; // Shadow IT / Sprawl operations
-            }
-            else if (type === 'elt') {
-                document.getElementById('eur_integration').value = 18000; // High integration syncs
-                document.getElementById('eur_storage').value = 5000;
-                document.getElementById('eur_processing').value = 25000; // Heavy dbt/SQL overlap
-                document.getElementById('eur_analytics').value = 5500;
-                document.getElementById('eur_governance').value = 500;
-                document.getElementById('eur_operations').value = 8000;
-            }
-            else if (type === 'optimized') {
-                document.getElementById('inp_queries').value = 5000; // Highly cached, low ad-hoc querying
-                document.getElementById('inp_users').value = 800; // Great adoption
-                document.getElementById('inp_data_added').value = 2000;
-                document.getElementById('eur_integration').value = 1000;
-                document.getElementById('eur_storage').value = 1200;
-                document.getElementById('eur_processing').value = 1500;
-                document.getElementById('eur_analytics').value = 3500; // Right-sized licenses
-                document.getElementById('eur_governance').value = 800; // Automated DQ
-                document.getElementById('eur_operations').value = 1200; // Serverless
-            }
-            calc();
-        }
-
-        function resetForm(clearLocal = true) {
-            document.querySelectorAll('input[type="number"], input[type="text"]').forEach(i => i.value = '');
-            document.querySelectorAll('input[type="number"][id^="eur_"]').forEach(i => i.value = '0');
-            document.querySelectorAll('input[type="number"][id^="u_"], input[type="number"][id^="r_"]').forEach(i => i.value = '0');
-            document.getElementById('inp_fx').value = '1.0';
-            document.querySelectorAll('input[type="checkbox"]').forEach(c => { c.checked = false; toggleMode(c.id.substring(4)); });
-
-            if (clearLocal) {
-                localStorage.removeItem('bi_cost_state');
-                document.getElementById('inp_country').value = '';
-                document.getElementById('inp_month').value = '2023-10';
-            }
-            calc();
-        }
-
-        function saveStateToLocal() {
-            const inputs = document.querySelectorAll('#tab-current input, #tab-current select');
-            let state = {};
-            inputs.forEach(i => {
-                if (i.type === 'checkbox') state[i.id] = i.checked;
-                else state[i.id] = i.value;
-            });
-            localStorage.setItem('bi_cost_state', JSON.stringify(state));
-            localStorage.setItem('bi_cost_trend', JSON.stringify(trendData));
-        }
-
-        function loadStateFromLocal() {
-            const saved = localStorage.getItem('bi_cost_state');
-            if (saved) {
-                const state = JSON.parse(saved);
-                Object.keys(state).forEach(k => {
-                    const el = document.getElementById(k);
-                    if (el) {
-                        if (el.type === 'checkbox') {
-                            el.checked = state[k];
-                            toggleMode(k.substring(4));
-                        } else {
-                            el.value = state[k];
-                        }
-                    }
+                    let pct = ((v / totalEur) * 100).toFixed(1) + '%';
+                    legHtml += `<div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="display:flex; align-items:center; gap:5px;"><div style="width:10px;height:10px;background:${COLORS[i % COLORS.length]};border-radius:2px;"></div> ${STEPS[i].id}</span>
+                        <b>${pct}</b>
+                    </div>`;
                 });
+
+                // knock out center for donut
+                ctx.beginPath(); ctx.arc(cx, cy, r * 0.6, 0, 2 * Math.PI);
+                ctx.fillStyle = 'var(--bg-panel)'; ctx.fill();
+
+                document.getElementById('leg_country_dist').innerHTML = legHtml;
+            };
+            drawRing();
+
+            // 3. Trends Chart
+            let gTotals = [];
+            trendData.forEach(m => {
+                let t = 0;
+                STEPS.forEach(s => t += parseFloat(m['eur_' + s.id]) || 0);
+                gTotals.push(t);
+            });
+            drawLineChart('cvs_country_trend', gTotals.reverse(), 'var(--dhl-red)');
+        }
+
+        function calcGlobal() {
+            let gTotalCost = 0;
+            let gTotalShipments = 0;
+            let gTotalUsers = 0;
+            let gTotalDataSize = 0;
+            let gTotalCorporateBudget = 0;
+            let countryCosts = [];
+            let countryLabels = [];
+            let matrixHTML = '';
+
+            const selectedMonth = document.getElementById('global_month_select').value;
+
+            // Determine target countries based on Active Context Dropdown
+            // If activeContext is 'Global', aggregate all. Otherwise, only aggregate the selected country.
+            let targetCountries = COUNTRIES;
+            let globalTrendData = new Array(24).fill(0);
+            let sparkTrends = new Array(24).fill(null).map(() => ({ cost: 0, ships: 0, users: 0, data: 0, corpBudget: 0 }));
+
+            if (activeContext && activeContext !== 'Global') {
+                targetCountries = [activeContext];
+                // Update the title to reflect the single country
+                document.getElementById('lbl_page_title').innerText = `${activeContext} Network Profile`;
+            } else {
+                document.getElementById('lbl_page_title').innerText = `BI Costing Performance Dashboard`;
             }
 
-            const savedTrend = localStorage.getItem('bi_cost_trend');
-            if (savedTrend) {
-                try {
-                    let parsed = JSON.parse(savedTrend);
-                    if (parsed && parsed.length === 24) {
-                        trendData = parsed;
+            targetCountries.forEach(c => {
+                // Read Trends to build the 24-month chart (never filtered)
+                let trendStr = localStorage.getItem(`bi_cost_trend_${c}`);
+                let cTrendArray = [];
+                if (trendStr) {
+                    try {
+                        cTrendArray = JSON.parse(trendStr);
+                        cTrendArray.forEach((m, idx) => {
+                            if (idx < 24) {
+                                let monT = 0;
+                                STEPS.forEach(s => monT += parseFloat(m['eur_' + s.id]) || 0);
+                                globalTrendData[idx] += monT;
+
+                                sparkTrends[idx].cost += monT;
+                                sparkTrends[idx].ships += parseFloat(m.shipments) || 0;
+                                sparkTrends[idx].users += parseFloat(m.users) || 0;
+                                sparkTrends[idx].data += parseFloat(m.total_data) || 0;
+                                sparkTrends[idx].corpBudget += monT * 50; 
+                            }
+                        });
+                    } catch (e) { }
+                }
+
+                // Determine active state for KPIs and Matrix based on Filter
+                let activeData = null;
+                if (selectedMonth === 'All_Active') {
+                    let stateStr = localStorage.getItem(`bi_cost_state_${c}`);
+                    if (stateStr) activeData = JSON.parse(stateStr);
+                } else {
+                    // Find the precise month in the trend array
+                    if (cTrendArray.length > 0) {
+                        activeData = cTrendArray.find(r => r.month === selectedMonth);
                     }
-                } catch (e) { }
+                }
+
+                if (activeData) {
+                    let subTotal = 0;
+                    STEPS.forEach(s => subTotal += parseFloat(activeData[`eur_${s.id}`]) || 0);
+
+                    let ships = parseFloat(activeData.inp_shipments) || 0;
+                    let users = parseFloat(activeData.inp_users) || 0;
+                    let tbSize = parseFloat(activeData.inp_total_data) || 0;
+                    // Mock Corporate Budget relative to BI cost for demo purposes, if not explicitly stored
+                    let corpBudget = subTotal * 50;
+
+                    if (subTotal > 0) {
+                        gTotalCost += subTotal;
+                        gTotalShipments += ships;
+                        gTotalUsers += users;
+                        gTotalDataSize += tbSize;
+                        gTotalCorporateBudget += corpBudget;
+
+                        countryCosts.push(subTotal);
+                        countryLabels.push(c);
+
+                        // Append to Matrix HTML
+                        let c_cps = ships > 0 ? (subTotal / ships) : 0;
+                        let c_cpu = users > 0 ? (subTotal / users) : 0;
+                        let c_dsps = ships > 0 ? (tbSize / ships) : 0;
+                        let c_pct = corpBudget > 0 ? (subTotal / corpBudget) * 100 : 0;
+
+                        matrixHTML += `
+                            <tr style="border-bottom: 1px solid var(--border-light);">
+                                <td style="padding: 10px; text-align: left; font-weight: 600; color: var(--text-main);">${c}</td>
+                                <td style="padding: 10px; color: var(--chart-1); font-weight: 600;">${formatEur(subTotal, 0)}</td>
+                                <td style="padding: 10px;">${ships.toLocaleString()}</td>
+                                <td style="padding: 10px;">${users.toLocaleString()}</td>
+                                <td style="padding: 10px;">${formatEur(c_cps, 4)}</td>
+                                <td style="padding: 10px;">${formatEur(c_cpu, 2)}</td>
+                                <td style="padding: 10px;">${c_dsps.toFixed(6)} TB</td>
+                                <td style="padding: 10px;">${c_pct.toFixed(1)}%</td>
+                            </tr>
+                        `;
+                    }
+                }
+            });
+
+            document.getElementById('global_matrix_tbody').innerHTML = matrixHTML;
+
+            // Calculate Monthly Average Data Change strictly from the 24-month trend aggregation
+            let avgDiff = "0.0%";
+            let trendColor = "var(--dhl-red)";
+            if (globalTrendData[0] > 0 && globalTrendData[11] > 0) {
+                let change = ((globalTrendData[11] - globalTrendData[0]) / globalTrendData[0]) * 100;
+                avgDiff = (change > 0 ? "+" : "") + change.toFixed(1) + "%";
+                trendColor = change < 0 ? "var(--chart-1)" : "var(--dhl-red)"; // down is good for costs
+            }
+
+            // Update Global KPIs for the Selected Context
+            document.getElementById('glb_kpi_total').innerText = formatEur(gTotalCost, 0);
+            document.getElementById('glb_kpi_cps').innerText = formatEur(gTotalShipments > 0 ? (gTotalCost / gTotalShipments) : 0, 4);
+            document.getElementById('glb_kpi_cpu').innerText = formatEur(gTotalUsers > 0 ? (gTotalCost / gTotalUsers) : 0, 2);
+            document.getElementById('glb_kpi_users').innerText = gTotalUsers.toLocaleString();
+
+            let dsps = gTotalShipments > 0 ? (gTotalDataSize / gTotalShipments) : 0;
+            document.getElementById('glb_kpi_dsps').innerText = dsps.toFixed(6) + " TB";
+            document.getElementById('glb_kpi_bivsit').innerText = gTotalCorporateBudget > 0 ? ((gTotalCost / gTotalCorporateBudget) * 100).toFixed(1) + "%" : "0.0%";
+
+            // ----------------------------------------
+            // SPARKLINE RENDERING (Looker Studio Style)
+            // ----------------------------------------
+            // We chart the trailing 12 months for visual crispness
+            let s_cost = [], s_cps = [], s_cpu = [], s_dsps = [], s_bivsit = [];
+
+            for(let i=0; i<12; i++) {
+                let g = sparkTrends[i];
+                if(g) {
+                    s_cost.push(g.cost);
+                    s_cps.push(g.ships > 0 ? (g.cost / g.ships) : 0);
+                    s_cpu.push(g.users > 0 ? (g.cost / g.users) : 0);
+                    s_dsps.push(g.ships > 0 ? (g.data / g.ships) : 0);
+                    s_bivsit.push(g.corpBudget > 0 ? (g.cost / g.corpBudget) : 0);
+                }
+            }
+            
+            drawSparkline('spark_total', s_cost, '#D40511'); // DHL Red
+            drawSparkline('spark_cps', s_cps, '#20C997'); // Green
+            drawSparkline('spark_cpu', s_cpu, '#3B82F6'); // Blue
+            drawSparkline('spark_dsps', s_dsps, '#8B5CF6'); // Purple
+            drawSparkline('spark_bivsit', s_bivsit, '#F59E0B'); // Orange
+
+            let pctIt = gTotalCorporateBudget > 0 ? (gTotalCost / gTotalCorporateBudget) * 100 : 2.0;
+            document.getElementById('glb_kpi_bivsit').innerText = pctIt.toFixed(1) + "%";
+
+            let trendKpiEl = document.getElementById('glb_kpi_trend_diff');
+            trendKpiEl.innerText = avgDiff;
+            trendKpiEl.style.color = trendColor;
+
+            // Draw Global Charts
+            // 1. Bar Chart Sorted
+            if (countryCosts.length > 0) {
+                let sortedCosts = [...countryCosts].map((v, i) => ({ v, label: countryLabels[i] })).sort((a, b) => b.v - a.v);
+                drawBarChart('cvs_global_costs', sortedCosts.map(x => x.label.substring(0, 6) + '.'), sortedCosts.map(x => x.v), COLORS);
+            }
+
+            // 2. Global Trend
+            drawLineChart('cvs_global_trend', globalTrendData.reverse(), 'var(--dhl-red)');
+        }
+
+        function populateHeaderDropdown() {
+            const sel = document.getElementById('header_country_select');
+            COUNTRIES.sort().forEach(c => {
+                let opt = document.createElement('option');
+                opt.value = c;
+                opt.innerText = c;
+                sel.appendChild(opt);
+            });
+
+            // Populate Global Month Filter
+            const monthSel = document.getElementById('global_month_select');
+            for (let m = 0; m < 24; m++) {
+                let monthStr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m % 12];
+                let yearStr = m < 12 ? "2025" : "2026";
+                let opt = document.createElement('option');
+                opt.value = `${monthStr} ${yearStr}`;
+                opt.innerText = `Historic State: ${monthStr} ${yearStr}`;
+                monthSel.appendChild(opt);
             }
         }
 
-        // --- Export ---
-        function exportCsv() {
-            if (!computedData.costs) return;
-            let csv = 'Step,EUR Cost,Cost_per_Shipment,Cost_per_User\n';
-            computedData.costs.forEach(c => {
-                csv += `"${c.label}",${c.eur},${computedData.kpis.shipments > 0 ? c.eur / computedData.inputs.shipments : 0},${computedData.inputs.users > 0 ? c.eur / computedData.inputs.users : 0}\n`;
-            });
-            csv += `"Total",${computedData.kpis.totalEur},${computedData.kpis.costPerShip},${computedData.kpis.costPerUser}\n`;
+        // --- 3. NAVIGATION ENGINE ---
+        function switchView(viewId, triggerElement) {
+            // Update Sidebar UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            triggerElement.classList.add('active');
 
-            downloadBlob(csv, 'text/csv', 'bi_costs_export.csv');
+            // Update View Container UI
+            document.querySelectorAll('.view-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+
+            // Toggle Context Selector visibility
+            let contextSelector = document.querySelector('.context-selector');
+            if (viewId === 'v_guidance' || viewId === 'v_master') {
+                contextSelector.style.display = 'none';
+            } else {
+                contextSelector.style.display = 'flex';
+            }
+
+            // Set Page Title
+            let titleMap = {
+                'v_global': activeContext === 'Global' ? 'BI Costing Performance Dashboard' : `${activeContext} Network Profile`,
+                'v_ingestion': 'Data Ingestion Workflow',
+                'v_master': 'Masterdata Explorer',
+                'v_guidance': 'Framework Guidance & Methodology'
+            };
+            document.getElementById('lbl_page_title').innerText = titleMap[viewId];
+
+            // Run rendering hooks if needed
+            if (viewId === 'v_global') calcGlobal();
+        }
+
+        function handleContextChange(newContext) {
+            if (activeContext !== 'Global' && activeContext) {
+                saveStateToLocal();
+            }
+
+            activeContext = newContext;
+            let currentActiveView = document.querySelector('.view-container.active').id;
+
+            // They picked a context (Global or Country). Route them properly via Single Dashboard Logic.
+            if (newContext === 'Global') {
+                document.getElementById('inp_ingest_country').value = '';
+                if (currentActiveView !== 'v_global') {
+                    document.querySelector('.nav-item[onclick*="v_global"]').click();
+                } else {
+                    calcGlobal();
+                }
+            } else {
+                // Specific Country Selected.
+                document.getElementById('inp_ingest_country').value = newContext;
+                loadStateFromLocal();
+                generateTrendGrid();
+                calcPreview();
+
+                if (currentActiveView === 'v_ingestion') {
+                    // Stay on Ingestion
+                } else {
+                    // By default, route them to the new unified Global Dashboard mapped to their country!
+                    document.querySelector('.nav-item[onclick*="v_global"]').click();
+                }
+            }
+        }
+
+        // --- 5. MASTERDATA & EXPORTS ---
+        function renderMasterData() {
+            let container = document.getElementById('master_dict_container');
+            if (!container) return;
+            let html = '<div style="margin-bottom:15px;"><b>Core Step Components (STEPS):</b><ul style="padding-left: 20px; margin-top:5px;">';
+            STEPS.forEach(s => html += `<li><b>${s.id}</b>: ${s.def}</li>`);
+            html += '</ul></div>';
+
+            html += '<div><b>Calculated Array Fields (GRID_ROWS):</b><ul style="padding-left: 20px; margin-top:5px;">';
+            GRID_ROWS.forEach(r => html += `<li><b>${r.id}</b> (${r.type}): ${r.label}</li>`);
+            html += '</ul></div>';
+
+            container.innerHTML = html;
         }
 
         function exportJson() {
-            if (!computedData.costs) return;
-            const json = JSON.stringify(computedData, null, 2);
-            downloadBlob(json, 'application/json', 'bi_costs_report.json');
+            let compiledDb = {};
+            COUNTRIES.forEach(c => {
+                let stateStr = localStorage.getItem(`bi_cost_state_${c}`);
+                let trendStr = localStorage.getItem(`bi_cost_trend_${c}`);
+                if (stateStr || trendStr) {
+                    compiledDb[c] = {
+                        snapshot: stateStr ? JSON.parse(stateStr) : {},
+                        trendArray: trendStr ? JSON.parse(trendStr) : []
+                    };
+                }
+            });
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(compiledDb, null, 2));
+            let link = document.createElement('a');
+            link.setAttribute("href", dataStr);
+            link.setAttribute("download", `dhl_bi_costing_global_${new Date().toISOString().substring(0, 10)}.json`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         }
 
-        function downloadBlob(content, type, filename) {
-            const blob = new Blob([content], { type: type });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+        function exportCsv() {
+            if (activeContext === 'Global' || !activeContext) {
+                alert("Please select a specific country to export its trend array.");
+                return;
+            }
+            if (trendData.length === 0) {
+                alert("No trend data available for this country.");
+                return;
+            }
+
+            let csv = "Metric";
+            trendData.forEach(m => csv += "," + m.month);
+            csv += "\n";
+
+            GRID_ROWS.forEach(r => {
+                csv += r.label;
+                trendData.forEach(m => {
+                    let v = m[r.id] !== undefined ? m[r.id] : "";
+                    csv += "," + v;
+                });
+                csv += "\n";
+            });
+
+            let blob = new Blob([csv], { type: 'text/csv' });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement('a');
             a.href = url;
-            a.download = filename;
+            a.download = `costing_trend_${activeContext.replace(/\//g, '_')}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
-        // Start
-        document.addEventListener("DOMContentLoaded", init);
+        // --- 6. TABBED GUIDANCE UI ---
+        function openGuidanceTab(tabId, btnElement) {
+            document.querySelectorAll('.guidance-tab').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('#guidance-tabs .btn').forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = 'var(--text-main)';
+            });
+
+            document.getElementById(tabId).style.display = 'block';
+            if (btnElement) {
+                btnElement.style.background = 'var(--dhl-red)';
+                btnElement.style.color = 'white';
+            }
+        }
+
+        // --- 7. MOCK SEEDING ENGINE ---
+        function seedMockData() {
+            if (!confirm("This will overwrite all country data with generic mock values to demonstrate the 24-month Global Dashboard. Proceed?")) return;
+
+            let baseShipments = { 'AU': 1200000, 'BNLX': 2500000, 'CBS': 800000, 'CZ PPL': 1500000, 'IN': 3500000, 'PL': 1800000, 'ES': 2200000, 'TH/MY': 1100000, 'TR': 3000000, 'US': 5000000, 'BRS': 500000 };
+
+            COUNTRIES.forEach(c => {
+                let s_base = baseShipments[c] || 1000000;
+                let c_base = s_base * 0.05; // Base mock IT scaling
+
+                let trendArray = [];
+                for (let m = 0; m < 24; m++) {
+                    let row = {};
+                    let monthStr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m % 12];
+                    let yearStr = m < 12 ? "2025" : "2026";
+                    row.month = `${monthStr} ${yearStr}`;
+
+                    let v_factor = 1 + (Math.random() * 0.1 - 0.05); // 5% variance per month
+
+                    row.shipments = Math.round(s_base * v_factor);
+                    row.inp_shipments = row.shipments;
+                    row.inp_users = Math.round(row.shipments / 10000);
+                    row.inp_revenue = row.shipments * 45;
+                    row.inp_queries = Math.round(row.inp_users * 150);
+                    row.inp_data_added = Math.round(Math.random() * 500) + 100;
+                    row.inp_total_data = parseFloat((10 + (m * 0.2)).toFixed(1));
+
+                    row.eur_integration = (c_base * v_factor) * 0.2;
+                    row.eur_storage = (c_base * v_factor) * 0.3;
+                    row.eur_processing = (c_base * v_factor) * 0.3;
+                    row.eur_analytics = (c_base * v_factor) * 0.15;
+                    row.eur_governance = (c_base * v_factor) * 0.025;
+                    row.eur_operations = (c_base * v_factor) * 0.025;
+
+                    trendArray.push(row);
+                }
+                localStorage.setItem(`bi_cost_trend_${c}`, JSON.stringify(trendArray));
+
+                // seed current state (mirroring Mar 2025)
+                let stateObj = trendArray[2];
+                localStorage.setItem(`bi_cost_state_${c}`, JSON.stringify(stateObj));
+            });
+
+            alert("Global Mock Data Seeded. The Dashboard will now refresh.");
+            window.location.reload();
+        }
+
+        function drawSparkline(canvasId, dataArr, color) {
+            let c = document.getElementById(canvasId);
+            if (!c || !dataArr || dataArr.length === 0) return;
+            
+            // High DPI support for smooth lines
+            let rect = c.getBoundingClientRect();
+            // In case display:none causes rect to be 0
+            if (rect.width === 0) return;
+
+            c.width = rect.width * 2;
+            c.height = rect.height * 2;
+            let ctx = c.getContext('2d');
+            ctx.scale(2, 2);
+            
+            ctx.clearRect(0, 0, rect.width, rect.height);
+            
+            let min = Math.min(...dataArr);
+            let max = Math.max(...dataArr);
+            let range = max - min;
+            let w = rect.width;
+            let h = rect.height;
+            let pad = 4; // internal padding
+            
+            ctx.beginPath();
+            
+            for (let i = 0; i < dataArr.length; i++) {
+                let x = (i / (dataArr.length - 1)) * w;
+                let y = h - pad;
+                if (range > 0) {
+                    y = h - pad - ((dataArr[i] - min) / range) * (h - pad * 2);
+                }
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            
+            // Soft gradient fill
+            ctx.lineTo(w, h);
+            ctx.lineTo(0, h);
+            ctx.closePath();
+            
+            let grad = ctx.createLinearGradient(0, 0, 0, h);
+            // using Hex parsing to append opacity safely
+            let opacityA = '33'; // 20%
+            let opacityB = '00'; // 0%
+            if (color.length === 7) {
+                grad.addColorStop(0, color + opacityA);
+                grad.addColorStop(1, color + opacityB);
+                ctx.fillStyle = grad;
+                ctx.fill();
+            }
+        }
+
+        // --- 8. EXCEL INTEGRATION ---
+        function downloadExcelTemplate() {
+            let wb = XLSX.utils.book_new();
+
+            // Structure the Headers exactly as expected by the GRID_ROWS array
+            let headers = ["Month"];
+            GRID_ROWS.forEach(r => headers.push(r.id)); // Use IDs to ensure accurate programmatic parsing
+            
+            let data = [headers];
+
+            // 24 Blank Months
+            for (let m = 0; m < 24; m++) {
+                let monthStr = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][m % 12];
+                let yearStr = m < 12 ? "2025" : "2026";
+                let row = [`${monthStr} ${yearStr}`];
+                for (let i = 1; i < headers.length; i++) row.push("");
+                data.push(row);
+            }
+
+            let ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // Format column widths
+            ws['!cols'] = [{ wch: 15 }];
+            for (let i = 1; i < headers.length; i++) ws['!cols'].push({ wch: 18 });
+
+            XLSX.utils.book_append_sheet(wb, ws, "24-Month Data");
+            XLSX.writeFile(wb, `DHL_eCommerce_Costing_Template.xlsx`);
+        }
+
+        function uploadExcelData(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+
+            let c = activeContext;
+            if (!c || c === 'Global') {
+                alert("Please select your specific Country from the top-right Context Dropdown before uploading data.");
+                event.target.value = ''; // Reset input
+                return;
+            }
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let data = new Uint8Array(e.target.result);
+                    let workbook = XLSX.read(data, { type: 'array' });
+                    let wsName = workbook.SheetNames[0];
+                    let jsonMap = XLSX.utils.sheet_to_json(workbook.Sheets[wsName]);
+
+                    if (jsonMap.length === 0) {
+                        alert("Excel file is empty.");
+                        return;
+                    }
+
+                    // Map Excel Array of Objects to LocalStorage Format
+                    let trendArray = [];
+                    jsonMap.forEach(row => {
+                        let parsedRow = { month: row.Month || "Unknown" };
+                        
+                        // Dynamically pull properties based on the GRID_ROWS dictionary
+                        GRID_ROWS.forEach(config => {
+                            parsedRow[config.id] = parseFloat(row[config.id]) || 0;
+                        });
+
+                        // Ensure UI-bound inputs map correctly to standard keys if not provided explicitly
+                        if(parsedRow.inp_shipments === undefined) parsedRow.inp_shipments = parsedRow.shipments;
+                        
+                        trendArray.push(parsedRow);
+                    });
+
+                    // Overwrite LocalStorage array
+                    localStorage.setItem(`bi_cost_trend_${c}`, JSON.stringify(trendArray));
+                    
+                    // Sync active Master State with Row 0
+                    localStorage.setItem(`bi_cost_state_${c}`, JSON.stringify(trendArray[0]));
+
+                    alert(`Success! Imported ${trendArray.length} months of data for ${c}. Updating dashboard...`);
+                    window.location.reload();
+
+                } catch (err) {
+                    console.error(err);
+                    alert("Fatal Parse Error: The Excel document is invalid or heavily modified from the original Template structure.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Boot
+        window.onload = init;
+
     </script>
 </body>
 
