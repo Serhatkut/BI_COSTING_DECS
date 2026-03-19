@@ -471,8 +471,74 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #A5ADBA;
         }
+
+        /* Maturity Assessment Styles */
+        .maturity-card {
+            margin-bottom: 24px;
+        }
+        .pillar-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .question-block {
+            margin-bottom: 20px;
+            background: #FAFBFC;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .question-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 12px;
+        }
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .radio-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 12px;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .radio-option:hover {
+            border-color: var(--dhl-yellow);
+            background: rgba(255, 204, 0, 0.05);
+        }
+        .radio-option input[type="radio"] {
+            margin-top: 3px;
+            accent-color: var(--dhl-red);
+        }
+        .radio-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+            user-select: none;
+        }
+        .radio-score {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-right: 4px;
+        }
     </style>
     <!-- ALGORITHMIC DATA HANDLING -->
+    <!-- Advanced Excel processing with Data Validation (Dropdowns) -->
+    <script src="https://unpkg.com/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://unpkg.com/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 </head>
 
@@ -488,20 +554,27 @@
             <h2>BI Cost Framework</h2>
         </div>
 
-        <div class="nav-section-title">Core Modules</div>
-        <div class="nav-item active" onclick="switchView('v_guidance', this)">
-            <span>📖</span> Framework Guidance
-        </div>
-        <div class="nav-item" onclick="switchView('v_global', this)">
-            <span>🌍</span> Cost Performance Dashboard
-        </div>
-        <div class="nav-item" onclick="switchView('v_ingestion', this)">
-            <span>📝</span> Data Ingestion
-        </div>
-        <div class="nav-item" onclick="switchView('v_master', this)">
-            <span>⚙️</span> Masterdata Explorer
+        <!-- CORE MODULES -->
+        <div class="sidebar-section">
+            <div class="section-title">CORE MODULES</div>
+            <div class="nav-item active" onclick="switchView('v_global', this)">
+                <span class="icon">🌍</span> Cost Performance Dashboard
+            </div>
+            <div class="nav-item" onclick="switchView('v_maturity', this)">
+                <span class="icon">📊</span> Maturity Assessment
+            </div>
+            <div class="nav-item" onclick="switchView('v_ingestion', this)">
+                <span class="icon">📝</span> Data Ingestion
+            </div>
+            <div class="nav-item" onclick="switchView('v_master', this)">
+                <span class="icon">⚙️</span> Masterdata Explorer
+            </div>
+            <div class="nav-item" onclick="switchView('v_guidance', this)">
+                <span class="icon">📖</span> Framework Guidance
+            </div>
         </div>
 
+        <!-- MANAGING COUNTRY -->
         <div class="sidebar-filters">
             <div class="filter-group">
                 <label>Managing Country</label>
@@ -511,7 +584,7 @@
             </div>
             <div class="filter-group" id="month_filter_container">
                 <label>Review Period</label>
-                <select id="global_month_select" onchange="calcGlobal()">
+                <select id="global_month_select" onchange="handleMonthChange()">
                     <option value="All_Active">Current State</option>
                 </select>
             </div>
@@ -576,6 +649,23 @@
                 <div class="kpi-card">
                     <div class="kpi-label">Monthly Data Scaling (Trend)</div>
                     <div class="kpi-value" id="glb_kpi_trend_diff">0.0%</div>
+                </div>
+            </div>
+
+            <!-- MATURITY SCORES -->
+            <div style="font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; margin-top: 10px;">Governance Maturity (Latest Assessments)</div>
+            <div class="grid-3" style="margin-bottom: 24px;">
+                <div class="kpi-card" style="border-top: 4px solid var(--chart-1);">
+                    <div class="kpi-label">Solid Foundations</div>
+                    <div class="kpi-value" id="glb_kpi_mat_1">0.0 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span></div>
+                </div>
+                <div class="kpi-card" style="border-top: 4px solid var(--chart-3);">
+                    <div class="kpi-label">Optimized Analytics Landscape</div>
+                    <div class="kpi-value" id="glb_kpi_mat_2">0.0 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span></div>
+                </div>
+                <div class="kpi-card" style="border-top: 4px solid var(--dhl-red);">
+                    <div class="kpi-label">Support for Growth</div>
+                    <div class="kpi-value" id="glb_kpi_mat_3">0.0 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span></div>
                 </div>
             </div>
 
@@ -772,11 +862,13 @@
                             localized or global state as JSON for backup, or pull CSV extracts for external BI tools.
                         </p>
 
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button class="btn btn-outline" onclick="exportJson()">Export Global Platform JSON</button>
                             <button class="btn btn-outline" onclick="exportCsv()">Export Active Data to CSV</button>
                             <button class="btn btn-outline" style="border-color: var(--dhl-red); color: var(--dhl-red);"
-                                onclick="seedMockData()">Seed Global Mock Data</button>
+                                onclick="seedMockData()">Seed Global Costing Data</button>
+                            <button class="btn btn-outline" style="border-color: var(--dhl-yellow); color: #333;"
+                                onclick="seedMockMaturity()">Seed Mock Maturity Data</button>
                         </div>
                     </div>
 
@@ -789,6 +881,210 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- VIEW: MATURITY ASSESSMENT -->
+        <div id="v_maturity" class="view-container">
+            <div class="card" style="background: linear-gradient(135deg, #1E202B 0%, #2A2E3D 100%); color: white; border: none;">
+                <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    <div class="brand-accent" style="width: 4px; height: 24px; background: var(--dhl-red);"></div> Data-Driven Governance Maturity Assessment
+                </div>
+                <p style="font-size: 14px; opacity: 0.8; line-height: 1.5; max-width: 900px;">
+                    Evaluate your organization's data-driven governance capabilities across three critical pillars: Solid Foundations, Optimized Analytics Landscape, and Support for Growth.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">1. Respondent Metadata</div>
+                <div class="grid-2">
+                    <div class="form-group" style="display: none;">
+                        <!-- Country mapped automatically from activeContext sidebar -->
+                        <input type="hidden" id="mat_country" value="">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Respondent Name</label>
+                        <input type="text" id="mat_name" class="form-input" placeholder="e.g. John Doe">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PILLAR 1: SOLID FOUNDATIONS -->
+            <div class="maturity-card card" style="border-top: 4px solid var(--chart-1);">
+                <div class="pillar-header" style="color: var(--chart-1);">SOLID FOUNDATIONS</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Foundational capabilities to ensure secure, standardized, and well-governed data structures</p>
+                
+                <!-- Q1 -->
+                <div class="question-block">
+                    <div class="question-title">Q1: 🔐 Data Security & Access Control</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Role-based access, authorization, audit trails, and encryption aligned with DHL standards.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q1" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q1" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q1" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q1" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q1" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="question-block">
+                    <div class="question-title">Q2: 🏗️ Data Architecture & Integration</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Visibility into architecture, structured ETL pipelines, and integrated infrastructure.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q2" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q2" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q2" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q2" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q2" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="question-block">
+                    <div class="question-title">Q3: 🧩 Standardized Data Structures & Modeling</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Common definitions, consistent schemas, and data model alignment across systems.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q3" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q3" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q3" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q3" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q3" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="question-block">
+                    <div class="question-title">Q4: 📇 Master & Reference Data Management</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Governance and stewardship for core master data (e.g., customers, sites, vehicles, services).</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q4" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q4" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q4" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q4" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q4" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PILLAR 2: OPTIMIZED ANALYTICS LANDSCAPE -->
+            <div class="maturity-card card" style="border-top: 4px solid var(--chart-3);">
+                <div class="pillar-header" style="color: var(--chart-3);">OPTIMIZED ANALYTICS LANDSCAPE</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Capabilities required for integrated, insight-rich granular business analytics powered by a unified data layer.</p>
+                
+                <!-- Q5 -->
+                <div class="question-block">
+                    <div class="question-title">Q5: 📊 Consistent and Scalable BI Platform</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">A single, governed BI environment that enables standardized dashboards, certified KPIs, and role-based access.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q5" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q5" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q5" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q5" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q5" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="question-block">
+                    <div class="question-title">Q6: 🧊 Unified and Granular Shipment Level Data (Golden Layer)</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">A centralized shipment-level event-based data source enabling historical Descriptive insights and real-time operational Diagnostics with at least 2 years of data.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q6" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q6" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q6" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q6" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q6" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="question-block">
+                    <div class="question-title">Q7: 🔮 Predictive Analytics (AI/ML-Based Forecasting)</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Use of AI/ML models to forecast volume, performance deviations, customer churn, or other trends.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q7" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q7" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q7" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q7" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q7" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="question-block">
+                    <div class="question-title">Q8: 🤖 Prescriptive Analytics (AI-Based Recommendations)</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">AI-driven tools provide actionable recommendations for operations, pricing, routing, or workforce planning.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q8" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q8" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q8" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q8" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q8" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PILLAR 3: SUPPORT FOR GROWTH -->
+            <div class="maturity-card card" style="border-top: 4px solid var(--dhl-red);">
+                <div class="pillar-header" style="color: var(--dhl-red);">SUPPORT FOR GROWTH</div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Governance and performance routines to scale and sustain a data-driven culture.</p>
+                
+                <!-- Q9 -->
+                <div class="question-block">
+                    <div class="question-title">Q9: 📋 Structured Performance Reviews with Action Tracking</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Embedded governance routines (e.g., QCP, First Choice) with tracked actions and transparent follow-up.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q9" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q9" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q9" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q9" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q9" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="question-block">
+                    <div class="question-title">Q10: ⚖️ Harmonized KPIs & Minimum Control Checks Points</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">QCP, FirstChoice Service Quality, Exceptions, and Billing Accuracy KPI's aligned with GHO consistent across domains, and supported by operational and financial control logic like EDD, scan events, and billing validation.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q10" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q10" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q10" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q10" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q10" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q11 -->
+                <div class="question-block">
+                    <div class="question-title">Q11: 🌐 Multi-Dimensional & Cross-Domain KPI Views (Customer / Site / Region / Side-by-Side 360)</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Dashboards enable cross-sectional analysis (e.g., service quality vs. customer satisfaction score vs profitability) with side-by-side benchmarking.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q11" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q11" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q11" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q11" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q11" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+
+                <!-- Q12 -->
+                <div class="question-block">
+                    <div class="question-title">Q12: 📶 Hierarchical, Aligned Dashboards (CEO to Site Level)</div>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Role-specific dashboards accessible from operational to executive level, aligned to unified KPIs.</p>
+                    <div class="radio-group">
+                        <label class="radio-option"><input type="radio" name="q12" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                        <label class="radio-option"><input type="radio" name="q12" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                        <label class="radio-option"><input type="radio" name="q12" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                        <label class="radio-option"><input type="radio" name="q12" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                        <label class="radio-option"><input type="radio" name="q12" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                <button id="btn_save_maturity" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;" onclick="saveMaturityAssessment()">Save Maturity Assessment</button>
             </div>
         </div>
 
@@ -822,7 +1118,7 @@
                             <img src="assets/dhl_integration_pipe_1773242797645.png" alt="Integration" style="max-height: 80px; max-width: 100%;">
                         </div>
                         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;">
-                            <b> ADF, Glue, Talend.</b> Compute for data movement from source systems.
+                            <b> ADF, Glue, Talend, ODI, Pentaho.</b> Compute for data movement from source systems.
                         </p>
                         <div style="font-size: 11px; font-weight: 600; color: var(--text-main); border-top: 1px dashed var(--border-light); padding-top: 8px; text-align: right;">FTE: Data Engineers</div>
                     </div>
@@ -837,7 +1133,7 @@
                             <img src="assets/dhl_storage_pipe_1773242813535.png" alt="Storage" style="max-height: 80px; max-width: 100%;">
                         </div>
                         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;">
-                            <b> ADLS Gen2, Snowflake, S3.</b> Baseline storage capacity (TB/month).
+                            <b> ADLS Gen2, Snowflake, Oracle, SAP HANA.</b> Baseline storage capacity (TB/month).
                         </p>
                         <div style="font-size: 11px; font-weight: 600; color: var(--text-main); border-top: 1px dashed var(--border-light); padding-top: 8px; text-align: right;">FTE: DBAs, Infra Engineers</div>
                     </div>
@@ -852,7 +1148,7 @@
                             <img src="assets/dhl_processing_pipe_1773242828403.png" alt="Processing" style="max-height: 80px; max-width: 100%;">
                         </div>
                         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;">
-                            <b> Databricks, BigQuery.</b> Query engines and transformations.
+                            <b> Databricks, BigQuery, Exasol, PL/SQL.</b> Query engines and transformations.
                         </p>
                         <div style="font-size: 11px; font-weight: 600; color: var(--text-main); border-top: 1px dashed var(--border-light); padding-top: 8px; text-align: right;">FTE: Analytics Engineers</div>
                     </div>
@@ -867,7 +1163,7 @@
                             <img src="assets/dhl_analytics_pipe_1773242861571.png" alt="Analytics" style="max-height: 80px; max-width: 100%;">
                         </div>
                         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;">
-                            <b> PowerBI, Tableau, Looker.</b> Frontend licensing and dash-boarding.
+                            <b> PowerBI, Tableau, SAP AC, Oracle BI.</b> Frontend licensing and dash-boarding.
                         </p>
                         <div style="font-size: 11px; font-weight: 600; color: var(--text-main); border-top: 1px dashed var(--border-light); padding-top: 8px; text-align: right;">FTE: BI Developers, Analysts</div>
                     </div>
@@ -887,7 +1183,7 @@
                             </div>
                             <div style="flex: 1;">
                                 <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
-                                    Security, access control, and data cataloging. <i>Purview, Collibra, Key Vault.</i>
+                                    Security, access control, and cataloging. <i>Purview, Collibra, Alation, Key Vault.</i>
                                 </p>
                                 <div style="font-size: 11px; margin-top: 8px; color: var(--text-main); font-weight: 600; border-top: 1px dashed var(--border-light); padding-top: 6px; text-align: right;">FTE: Architects, Stewards</div>
                             </div>
@@ -906,7 +1202,7 @@
                             </div>
                             <div style="flex: 1;">
                                 <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
-                                    Workflow orchestration and health monitoring. <i>Airflow, DevOps, Monitoring.</i>
+                                    Workflow orchestration and monitoring. <i>Airflow, DevOps, Jenkins, SolarWinds.</i>
                                 </p>
                                 <div style="font-size: 11px; margin-top: 8px; color: var(--text-main); font-weight: 600; border-top: 1px dashed var(--border-light); padding-top: 6px; text-align: right;">FTE: DevOps, Admins</div>
                             </div>
@@ -914,6 +1210,108 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- MATURITY ASSESSMENT GUIDANCE -->
+            <div class="card" style="background: var(--bg-body); border: 1px solid var(--border-light); padding: 30px; margin-top: 24px;">
+                <h2 style="margin-bottom: 15px;">Data-Driven Governance <span style="font-weight: 400;">Information Management Maturity</span></h2>
+                
+                <!-- LEGEND -->
+                <div style="display: flex; gap: 4px; margin-bottom: 24px; font-size: 11px; text-align: center;">
+                    <div style="flex: 1; border: 1px solid #D40511;">
+                        <div style="background: #D40511; color: white; padding: 6px; font-weight: bold;">1 - Not Present</div>
+                        <div style="padding: 10px; background: white; color: var(--dhl-red);">Capability does not exist or is not practiced at all.</div>
+                    </div>
+                    <div style="flex: 1; border: 1px solid #FF8C00;">
+                        <div style="background: #FF8C00; color: white; padding: 6px; font-weight: bold;">2 - Initial</div>
+                        <div style="padding: 10px; background: white; color: #FF8C00;">Capability exists in a very limited or experimental form.</div>
+                    </div>
+                    <div style="flex: 1; border: 1px solid #FFCC00;">
+                        <div style="background: #FFCC00; color: #333; padding: 6px; font-weight: bold;">3 - Developing</div>
+                        <div style="padding: 10px; background: white; color: #8C6A00;">Capability is partially implemented with room for standardization.</div>
+                    </div>
+                    <div style="flex: 1; border: 1px solid #7ED321;">
+                        <div style="background: #7ED321; color: white; padding: 6px; font-weight: bold;">4 - Established</div>
+                        <div style="padding: 10px; background: white; color: #417505;">Capability is well-defined, standardized, and consistently applied.</div>
+                    </div>
+                    <div style="flex: 1; border: 1px solid #008A27;">
+                        <div style="background: #008A27; color: white; padding: 6px; font-weight: bold;">5 - Fully Integrated</div>
+                        <div style="padding: 10px; background: white; color: #008A27;">Capability is embedded into operations, continuously improved, and optimized.</div>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header" style="background: #999; color: white; padding: 10px; margin: -24px -24px 20px -24px; border-radius: 8px 8px 0 0; text-align: center; font-size: 14px; text-transform: uppercase;">
+                            Solid Foundations <span style="font-size: 16px;">🛡️</span>
+                        </div>
+                        <p style="font-size: 13px; margin-bottom: 20px; font-style: italic; text-align: center;">Foundational capabilities to ensure secure, standardized, and well-governed data structures</p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Data Security & Access Control</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Role-based access, authorization, audit trails, and encryption aligned with DHL standards.</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Data Architecture & Integration</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Visibility into architecture, structured ETL pipelines, and integrated infrastructure.</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Standardized Data Structures & Modeling</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Common definitions, consistent schemas, and data model alignment across systems.</div>
+                        </div>
+                        <div style="margin-bottom: 0;">
+                            <div style="font-weight: bold; font-size: 13px;">Master & Reference Data Management</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Governance and stewardship for core master data (e.g., customers, sites, vehicles, services).</div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header" style="background: #999; color: white; padding: 10px; margin: -24px -24px 20px -24px; border-radius: 8px 8px 0 0; text-align: center; font-size: 14px; text-transform: uppercase;">
+                            Optimized Analytics Landscape <span style="font-size: 16px;">📊</span>
+                        </div>
+                        <p style="font-size: 13px; margin-bottom: 20px; font-style: italic; text-align: center;">Capabilities required for integrated, insight-rich granular business analytics powered by a unified data layer.</p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Consistent and Scalable BI Platform</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">A single, governed BI environment that enables standardized dashboards, certified KPIs, and role-based access.</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Unified and Granular Shipment Level Data (Golden Layer)</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">A centralized shipment-level event-based data source enabling historical Descriptive insights and real-time operational Diagnostics with at least 2 years of data.</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Predictive Analytics (AI/ML-Based Forecasting)</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Use of AI/ML models to forecast volume, performance deviations, customer churn, or other trends.</div>
+                        </div>
+                        <div style="margin-bottom: 0;">
+                            <div style="font-weight: bold; font-size: 13px;">Prescriptive Analytics (AI-Based Recommendations)</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">AI-driven tools provide actionable recommendations for operations, pricing, routing, or workforce planning.</div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-header" style="background: #999; color: white; padding: 10px; margin: -24px -24px 20px -24px; border-radius: 8px 8px 0 0; text-align: center; font-size: 14px; text-transform: uppercase;">
+                            Support for Growth <span style="font-size: 16px;">🚀</span>
+                        </div>
+                        <p style="font-size: 13px; margin-bottom: 20px; font-style: italic; text-align: center;">Governance and performance routines to scale and sustain a data-driven culture.</p>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Structured Performance Reviews with Action Tracking</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Embedded governance routines (e.g., QCP, First Choice) with tracked actions and transparent follow-up.</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Harmonized KPIs & Minimum Control Checks Points</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">QCP, FirstChoice Service Quality, Exceptions, and Billing Accuracy KPI's aligned with GHO consistent across domains, and supported by operational and financial control logic like EDD, scan events, and billing validation.</div>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-weight: bold; font-size: 13px;">Multi-Dimensional & Cross-Domain KPI Views (Customer / Site / Region / Side-by-Side 360)</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Dashboards enable cross-sectional analysis (e.g., service quality vs. customer satisfaction score vs profitability) with side-by-side benchmarking.</div>
+                        </div>
+                        <div style="margin-bottom: 0;">
+                            <div style="font-weight: bold; font-size: 13px;">Hierarchical, Aligned Dashboards (CEO to Site Level)</div>
+                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Role-specific dashboards accessible from operational to executive level, aligned to unified KPIs.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- KPI & METRICS CATALOG SECTION -->
@@ -990,6 +1388,7 @@
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- FOOTER BRANDING -->
             <footer style="margin-top: 60px; padding-top: 30px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; opacity: 0.7;">
@@ -1009,12 +1408,12 @@
     <script>
         // --- 1. CORE DATA DICTIONARY ---
         const STEPS = [
-            { id: 'integration', label: 'A. Integration', icon: '🔄', def: 'Moving data from source systems (ERP, CRM) to the analytical platform.' },
-            { id: 'storage', label: 'B. Storage', icon: '🗄️', def: 'Persisting data in operational data stores, data lakes, or analytical databases.' },
-            { id: 'processing', label: 'C. Processing', icon: '⚙️', def: 'The compute power required for transforming, modeling, validating, and joining data.' },
-            { id: 'analytics', label: 'D. Analytics & Consumption', icon: '📊', def: 'Frontend BI platforms (PowerBI, Tableau), custom portals, and embedded analytics.' },
-            { id: 'governance', label: 'E. Governance', icon: '🛡️', def: 'Ensuring data is safe, compliant, and trustworthy.' },
-            { id: 'operations', label: 'F. Operations', icon: '🛠️', def: 'Keeping the platform running smoothly. Orchestration, monitoring.' }
+            { id: 'integration', label: 'A. Integration', icon: '🔄', def: 'Moving data from source systems. Examples: ADF, Glue, Talend, ODI, Pentaho, Informatica, SAP Data Services.' },
+            { id: 'storage', label: 'B. Storage', icon: '🗄️', def: 'Persisting data in operational data stores or lakes. Examples: ADLS Gen2, Snowflake, S3, Oracle Exadata, SAP HANA, SQL Server.' },
+            { id: 'processing', label: 'C. Processing', icon: '⚙️', def: 'Compute power for transforming and modeling data. Examples: Databricks, BigQuery, Exasol, Spark on EMR, Oracle PL/SQL.' },
+            { id: 'analytics', label: 'D. Analytics & Consumption', icon: '📊', def: 'Frontend BI platforms and custom portals. Examples: PowerBI, Tableau, Looker, SAP Analytics Cloud, Qlik, Oracle BI.' },
+            { id: 'governance', label: 'E. Governance', icon: '🛡️', def: 'Ensuring data is safe and compliant. Examples: Purview, Collibra, Key Vault, Alation, Informatica Axon.' },
+            { id: 'operations', label: 'F. Operations', icon: '🛠️', def: 'Platform orchestration and monitoring. Examples: Airflow, DevOps, Jenkins, Control-M, SolarWinds.' }
         ];
 
         const GRID_ROWS = [
@@ -1025,13 +1424,7 @@
             { id: 'it_cost', label: 'Total IT Cost (€)', type: 'driver' },
             { id: 'queries', label: 'Queries (#)', type: 'driver' },
             { id: 'data_added', label: 'Data Added (GB)', type: 'driver' },
-            { id: 'total_data', label: 'Total Data Size (TB)', type: 'driver' },
-            { id: 'eur_integration', label: 'Integration (EUR)', type: 'cost' },
-            { id: 'eur_storage', label: 'Storage (EUR)', type: 'cost' },
-            { id: 'eur_processing', label: 'Processing (EUR)', type: 'cost' },
-            { id: 'eur_analytics', label: 'Analytics (EUR)', type: 'cost' },
-            { id: 'eur_governance', label: 'Governance (EUR)', type: 'cost' },
-            { id: 'eur_operations', label: 'Operations (EUR)', type: 'cost' }
+            { id: 'total_data', label: 'Total Data Size (TB)', type: 'driver' }
         ];
 
         const COLORS = ['#FFCC00', '#D40511', '#4A4A4A', '#888888', '#FFEB85', '#990000', '#222222'];
@@ -1040,7 +1433,7 @@
             'AU (Australia)', 'BNLX (Benelux)', 'CBS (Cross Border)',
             'CZ (PPL Czech)', 'IN (Blue Dart India)', 'PL (Poland)',
             'ES (Spain)', 'TH/MY (Thailand/Malaysia)', 'TR (Türkiye)',
-            'US (United States)', 'BRS (Global Head Office)'
+            'UK (United Kingdom)', 'US (United States)', 'BRS (Global Head Office)'
         ];
 
         let activeContext = 'Global';
@@ -1051,6 +1444,139 @@
         let sparkStore = {}; // will hold data arrays and month labels for tooltips
 
         // --- 1.5 STATE MANAGEMENT ---
+        function loadMaturityAssessment() {
+            if (activeContext === 'Global' || !activeContext) {
+                // Clear the form and disable save if Global
+                document.getElementById('mat_name').value = '';
+                for (let i = 1; i <= 12; i++) {
+                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (checked) checked.checked = false;
+                }
+                return;
+            }
+            
+            let selectedMonth = document.getElementById('global_month_select').value;
+            let histStr = localStorage.getItem(`bi_cost_maturity_history_${activeContext}`);
+            let history = histStr ? JSON.parse(histStr) : [];
+            
+            // Find specific month
+            let record = history.find(h => h.month === selectedMonth);
+            
+            if (record) {
+                document.getElementById('mat_name').value = record.respondent || '';
+                for (let i = 1; i <= 12; i++) {
+                    let score = record.scores[`q${i}`];
+                    if (score) {
+                        let radio = document.querySelector(`input[name="q${i}"][value="${score}"]`);
+                        if (radio) radio.checked = true;
+                    }
+                }
+            } else {
+                // Clear form if no record for this month
+                document.getElementById('mat_name').value = '';
+                for (let i = 1; i <= 12; i++) {
+                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (checked) checked.checked = false;
+                }
+            }
+        }
+
+        function saveMaturityAssessment() {
+            let country = activeContext;
+            if (country === 'Global' || !country) {
+                alert("Please select a specific country in the left sidebar to save an assessment.");
+                return;
+            }
+
+            let respondent = document.getElementById('mat_name').value;
+            let selectedMonth = document.getElementById('global_month_select').value;
+            
+            if (selectedMonth === 'All_Active') {
+                alert("Please select a specific month from the Review Period dropdown to save historical data.");
+                return;
+            }
+
+            let response = {
+                month: selectedMonth,
+                country: country,
+                respondent: respondent,
+                timestamp: new Date().toISOString(),
+                scores: {}
+            };
+
+            for (let i = 1; i <= 12; i++) {
+                let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                if (!checked) {
+                    alert(`Please answer question Q${i} before saving.`);
+                    return;
+                }
+                response.scores[`q${i}`] = parseInt(checked.value);
+            }
+
+            // Save historically
+            let histStr = localStorage.getItem(`bi_cost_maturity_history_${country}`);
+            let history = histStr ? JSON.parse(histStr) : [];
+            
+            let existingIdx = history.findIndex(h => h.month === selectedMonth);
+            if (existingIdx > -1) {
+                history[existingIdx] = response;
+            } else {
+                history.push(response);
+            }
+            
+            localStorage.setItem(`bi_cost_maturity_history_${country}`, JSON.stringify(history));
+
+            let btn = document.getElementById('btn_save_maturity');
+            let oldText = btn.innerText;
+            btn.innerText = 'Assessment Saved ✓';
+            btn.style.background = 'var(--chart-1)';
+            setTimeout(() => {
+                btn.innerText = oldText;
+                btn.style.background = 'var(--dhl-red)';
+            }, 2000);
+            
+            if (activeContext === country || activeContext === 'Global') {
+                calcGlobal(); 
+            }
+        }
+
+        function getLatestMaturityScores(targetCountries) {
+            let totals = { p1: 0, p2: 0, p3: 0, count: 0 };
+            let selectedMonth = document.getElementById('global_month_select').value;
+            
+            targetCountries.forEach(c => {
+                let histStr = localStorage.getItem(`bi_cost_maturity_history_${c}`);
+                if (histStr) {
+                    try {
+                        let history = JSON.parse(histStr);
+                        let record;
+                        if (selectedMonth !== 'All_Active') {
+                            record = history.find(h => h.month === selectedMonth);
+                        } else {
+                            // Find latest chronologically if "All_Active" selected
+                            history.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                            record = history[0]; // newest
+                        }
+                        
+                        if (record) {
+                            let s = record.scores;
+                            totals.p1 += (s.q1 + s.q2 + s.q3 + s.q4) / 4;
+                            totals.p2 += (s.q5 + s.q6 + s.q7 + s.q8) / 4;
+                            totals.p3 += (s.q9 + s.q10 + s.q11 + s.q12) / 4;
+                            totals.count += 1;
+                        }
+                    } catch (e) { console.error(e); }
+                }
+            });
+
+            if (totals.count === 0) return { p1: 0, p2: 0, p3: 0 };
+            return {
+                p1: totals.p1 / totals.count,
+                p2: totals.p2 / totals.count,
+                p3: totals.p3 / totals.count
+            };
+        }
+
         function saveStateToLocal() {
             if (activeContext === 'Global' || !activeContext) return;
 
@@ -1675,6 +2201,12 @@
 
             // 2. Global Trend - Fix: use spread to copy array instead of .reverse() in place
             drawLineChart('cvs_global_trend', [...globalTrendData], 'var(--dhl-red)');
+
+            // 3. Update Maturity Scores
+            let matScores = getLatestMaturityScores(targetCountries);
+            document.getElementById('glb_kpi_mat_1').innerHTML = `${matScores.p1.toFixed(1)} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span>`;
+            document.getElementById('glb_kpi_mat_2').innerHTML = `${matScores.p2.toFixed(1)} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span>`;
+            document.getElementById('glb_kpi_mat_3').innerHTML = `${matScores.p3.toFixed(1)} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span>`;
         }
 
         // --- INTERACTIVITY FUNCTIONS ---
@@ -1750,7 +2282,7 @@
 
             // Toggle Sidebar Month Filter visibility
             let monthFilter = document.getElementById('month_filter_container');
-            if (viewId === 'v_global') {
+            if (viewId === 'v_global' || viewId === 'v_maturity') {
                 monthFilter.style.display = 'flex';
             } else {
                 monthFilter.style.display = 'none';
@@ -1761,12 +2293,20 @@
                 'v_global': activeContext === 'Global' ? 'BI Costing Performance Dashboard' : `${activeContext} Network Profile`,
                 'v_ingestion': 'Data Ingestion Workflow',
                 'v_master': 'Masterdata Explorer',
-                'v_guidance': 'How to Calculate the BI Cost'
+                'v_guidance': 'How to Calculate the BI Cost',
+                'v_maturity': 'Data-Driven Governance Maturity'
             };
             document.getElementById('lbl_page_title').innerText = titleMap[viewId];
 
             // Run rendering hooks if needed
             if (viewId === 'v_global') calcGlobal();
+            if (viewId === 'v_maturity') loadMaturityAssessment();
+        }
+
+        function handleMonthChange() {
+            let currentActiveView = document.querySelector('.view-container.active').id;
+            if (currentActiveView === 'v_global') calcGlobal();
+            if (currentActiveView === 'v_maturity') loadMaturityAssessment();
         }
 
         function handleContextChange(newContext) {
@@ -1777,13 +2317,15 @@
             activeContext = newContext;
             let currentActiveView = document.querySelector('.view-container.active').id;
 
-            // They picked a context (Global or Country). Route them properly via Single Dashboard Logic.
             if (newContext === 'Global') {
                 document.getElementById('inp_ingest_country').value = '';
-                if (currentActiveView !== 'v_global') {
-                    document.querySelector('.nav-item[onclick*="v_global"]').click();
-                } else {
+                if (currentActiveView === 'v_global') {
                     calcGlobal();
+                } else if (currentActiveView === 'v_maturity') {
+                    loadMaturityAssessment();
+                } else if (currentActiveView === 'v_ingestion') {
+                    alert("Data Ingestion mode requires selecting a specific country from the left menu.");
+                    document.querySelector('.nav-item[onclick*="v_global"]').click();
                 }
             } else {
                 // Specific Country Selected.
@@ -1792,13 +2334,23 @@
                 generateTrendGrid();
                 calcPreview();
 
-                if (currentActiveView === 'v_ingestion') {
-                    // Stay on Ingestion
-                } else {
-                    // By default, route them to the new unified Global Dashboard mapped to their country!
-                    document.querySelector('.nav-item[onclick*="v_global"]').click();
+                if (currentActiveView === 'v_global') {
+                    calcGlobal();
+                } else if (currentActiveView === 'v_maturity') {
+                    loadMaturityAssessment();
                 }
+                // If on Ingestion, Guidance, or Masterdata, we just elegantly remain there!
             }
+            
+            // Set Page Title cleanly
+            let titleMap = {
+                'v_global': activeContext === 'Global' ? 'BI Costing Performance Dashboard' : `${activeContext} Network Profile`,
+                'v_ingestion': 'Data Ingestion Workflow',
+                'v_master': 'Masterdata Explorer',
+                'v_guidance': 'How to Calculate the BI Cost',
+                'v_maturity': 'Data-Driven Governance Maturity'
+            };
+            document.getElementById('lbl_page_title').innerText = titleMap[currentActiveView];
         }
 
         // --- 5. MASTERDATA & EXPORTS ---
@@ -1874,7 +2426,6 @@
 
         // --- 7. MOCK SEEDING ENGINE ---
         function seedMockData() {
-            if (!confirm("This will overwrite all country data with generic mock values to demonstrate the 24-month Global Dashboard. Proceed?")) return;
 
             let baseShipments = { 'AU': 1200000, 'BNLX': 2500000, 'CBS': 800000, 'CZ PPL': 1500000, 'IN': 3500000, 'PL': 1800000, 'ES': 2200000, 'TH/MY': 1100000, 'TR': 3000000, 'US': 5000000, 'BRS': 500000 };
 
@@ -1922,6 +2473,47 @@
                 STEPS.forEach(s => snapshot[`eur_${s.id}`] = stateRow[`eur_${s.id}`]);
                 localStorage.setItem(`bi_cost_state_${c}`, JSON.stringify(snapshot));
             });
+            alert("Costing Data successfully seeded.");
+            window.location.reload();
+        }
+
+        function seedMockMaturity() {
+            
+            COUNTRIES.forEach(c => {
+                let history = [];
+                for (let m = 0; m < 24; m++) {
+                    let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    let monthStr = monthNames[m % 12];
+                    let yearStr = m < 12 ? "2025" : "2026";
+                    
+                    // Gradual improvement over 24 months
+                    let baseScore = 2 + (m * 0.1); 
+                    
+                    history.push({
+                        month: `${monthStr} ${yearStr}`,
+                        country: c,
+                        respondent: "System Seed",
+                        timestamp: new Date().toISOString(),
+                        scores: {
+                            q1: Math.min(5, Math.max(1, Math.round(baseScore + Math.random()))),
+                            q2: Math.min(5, Math.max(1, Math.round(baseScore + Math.random()))),
+                            q3: Math.min(5, Math.max(1, Math.round(baseScore + Math.random()))),
+                            q4: Math.min(5, Math.max(1, Math.round(baseScore + Math.random()))),
+                            q5: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 0.5))),
+                            q6: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 0.5))),
+                            q7: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 0.5))),
+                            q8: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 0.5))),
+                            q9: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 1))),
+                            q10: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 1))),
+                            q11: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 1))),
+                            q12: Math.min(5, Math.max(1, Math.round(baseScore + Math.random() - 1)))
+                        }
+                    });
+                }
+                localStorage.setItem(`bi_cost_maturity_history_${c}`, JSON.stringify(history));
+            });
+            alert("Maturity Data successfully seeded.");
+            window.location.reload();
         }
 
         function drawSparkline(canvasId, dataArr, color, labels = [], unit = '') {
@@ -1982,64 +2574,98 @@
         }
 
         // --- 8. EXCEL INTEGRATION ---
-        function downloadExcelTemplate() {
+        async function downloadExcelTemplate() {
             try {
-                let wb = XLSX.utils.book_new();
-                let headers = ["Month"];
-                GRID_ROWS.forEach(r => headers.push(r.id));
-                STEPS.forEach(s => headers.push(`eur_${s.id}`));
-                
-                let data = [headers];
-                for (let m = 0; m < 24; m++) {
-                    let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                    let yearStr = m < 12 ? "2025" : "2026";
-                    let row = [`${monthNames[m % 12]} ${yearStr}`];
-                    // Initialize with 0 or empty for numeric guide
-                    for (let i = 1; i < headers.length; i++) row.push(0); 
-                    data.push(row);
-                }
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = 'DHL Global BI Governance';
+                workbook.lastModifiedBy = 'Serhat Kut PhD';
+                workbook.created = new Date();
+                workbook.modified = new Date();
 
-                let ws = XLSX.utils.aoa_to_sheet(data);
+                const sheet = workbook.addWorksheet('DHL_BI_Costing', {
+                    views: [{ state: 'frozen', xSplit: 2, ySplit: 1 }]
+                });
+
+                // 1. Define Columns
+                const cols = [
+                    { header: 'Country', key: 'country', width: 25 },
+                    { header: 'Month', key: 'month', width: 15 }
+                ];
+                GRID_ROWS.forEach(r => cols.push({ header: r.label, key: r.id, width: 20 }));
+                STEPS.forEach(s => cols.push({ header: s.label + ' (EUR)', key: `eur_${s.id}`, width: 22 }));
+                sheet.columns = cols;
+
+                // 2. Style Headers
+                const headerRow = sheet.getRow(1);
+                headerRow.font = { name: 'Arial', bold: true, color: { argb: 'FFFFFFFF' } };
+                headerRow.fill = {
+                    type: 'pattern',
+                    pattern: 'solid',
+                    fgColor: { argb: 'FFD40511' } // DHL Red
+                };
+                headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+                // 3. Generate 24 months of data
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const countryPreFill = (activeContext && activeContext !== 'Global') ? activeContext : "";
                 
-                // Bold Headers (if supported by the mini-build of SheetJS often used)
-                // Even without styling plugins, we can set widths and types
-                ws['!cols'] = headers.map(() => ({ wch: 18 }));
-                
-                // Force numeric type for all cells except first column
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                for(let R = range.s.r + 1; R <= range.e.r; ++R) {
-                    for(let C = range.s.c + 1; C <= range.e.c; ++C) {
-                        let cell_ref = XLSX.utils.encode_cell({r:R, c:C});
-                        if(ws[cell_ref]) ws[cell_ref].t = 'n';
+                for (let m = 0; m < 24; m++) {
+                    const yearStr = m < 12 ? "2025" : "2026";
+                    const monthLabel = `${monthNames[m % 12]} ${yearStr}`;
+                    
+                    const rowData = {
+                        country: countryPreFill,
+                        month: monthLabel
+                    };
+                    // Fill numeric goals with 0
+                    GRID_ROWS.forEach(r => rowData[r.id] = 0);
+                    STEPS.forEach(s => rowData[`eur_${s.id}`] = 0);
+                    
+                    const row = sheet.addRow(rowData);
+                    
+                    // Zebra striping
+                    if (m % 2 !== 0) {
+                        row.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: 'FFF4F5F7' }
+                        };
                     }
                 }
 
-                XLSX.utils.book_append_sheet(wb, ws, "DHL_BI_Costing");
-                
-                // Use a more robust download method to ensure extension
-                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-                function s2ab(s) {
-                    const buf = new ArrayBuffer(s.length);
-                    const view = new Uint8Array(buf);
-                    for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-                    return buf;
+                // 4. Add Data Validation (Dropdown) for Country Column (Col A)
+                // We apply it to rows 2 through 25
+                const countryListString = `"${COUNTRIES.join(',')}"`;
+                for (let i = 2; i <= 25; i++) {
+                    sheet.getCell(`A${i}`).dataValidation = {
+                        type: 'list',
+                        allowBlank: true,
+                        formulae: [countryListString],
+                        showErrorMessage: true,
+                        errorTitle: 'Invalid Country',
+                        error: 'Please select a valid country from the DHL network dropdown list.'
+                    };
                 }
-                
-                const blob = new Blob([s2ab(wbout)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = "DHL_BI_Costing_Template.xlsx";
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 0);
+
+                // 5. Add Instructions Sheet
+                const instSheet = workbook.addWorksheet('Instructions');
+                instSheet.columns = [
+                    { header: 'Guideline', key: 'g', width: 30 },
+                    { header: 'Description', key: 'd', width: 80 }
+                ];
+                instSheet.addRow({ g: 'Formatting', d: 'Do not delete the "Country" or "Month" columns.' });
+                instSheet.addRow({ g: 'Country Selection', d: 'Use the dropdown list in the Country column to ensure data attaches to the correct dashboard.' });
+                instSheet.addRow({ g: 'Numeric Inputs', d: 'Enter only numbers into the metric and cost columns. No currency symbols.' });
+                instSheet.getRow(1).font = { bold: true };
+
+                // 6. Finalize and Download
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                saveAs(blob, 'DHL_BI_Costing_Template.xlsx');
 
             } catch (err) {
-                console.error("Excel Export Error:", err);
-                alert("Could not generate Excel template.");
+                console.error("Excel Export Error (ExcelJS):", err);
+                alert("Could not generate advanced Excel template.");
             }
         }
 
@@ -2048,11 +2674,8 @@
             if (!file) return;
 
             let c = activeContext;
-            if (!c || c === 'Global') {
-                alert("Please select your specific Country from the top-right Context Dropdown before uploading data.");
-                event.target.value = ''; // Reset input
-                return;
-            }
+            // Removed hard block on Global context as we now detect from file
+            
 
             let reader = new FileReader();
             reader.onload = function(e) {
@@ -2066,6 +2689,21 @@
                         alert("Excel file is empty.");
                         return;
                     }
+
+                    // Auto-Detect Country from the first row
+                    let detectedCountry = jsonMap[0].Country;
+                    if (!detectedCountry && c && c !== 'Global') {
+                        detectedCountry = c; // Fallback to current selection if column is missing/empty
+                    }
+
+                    if (!detectedCountry || !COUNTRIES.includes(detectedCountry)) {
+                        alert(`Could not identify a valid Country in the "Country" column. Found: "${detectedCountry || 'nothing'}". Please ensure you use a valid country name from the DHL network.`);
+                        event.target.value = '';
+                        return;
+                    }
+
+                    c = detectedCountry; // Set target country context for storage
+                    
 
                     // Map Excel Array of Objects to LocalStorage Format
                     let trendArray = [];
