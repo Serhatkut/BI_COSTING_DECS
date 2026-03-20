@@ -698,6 +698,7 @@
                 <div class="kpi-card">
                     <div class="kpi-label">Active Application Users</div>
                     <div class="kpi-value" id="glb_kpi_users">0</div>
+                    <canvas id="spark_users" class="sparkline"></canvas>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-label">Data Size / Shipment</div>
@@ -768,32 +769,32 @@
                 </div>
             </div>
 
-            <div class="grid-2" style="margin-bottom: 24px;">
-                <div class="card" style="height: 300px;">
-                    <div class="card-header">BI Cost Distribution by Step</div>
-                    <div class="kpi-card-body" style="height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
-                        <div id="glb_cost_dist_bars" style="display: flex; height: 36px; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
-                        <div id="glb_cost_dist_legend" style="display: flex; gap: 15px; font-size: 12px; flex-wrap: wrap; justify-content: center;"></div>
+            <div style="margin-bottom: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+                <div class="card" style="height: 380px; display: flex; flex-direction: column;">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px;">
+                        <span>BI Cost Distribution Analytics</span>
+                        <div id="glb_cost_dist_legend" style="display: flex; gap: 15px; font-size: 11px; flex-wrap: wrap; font-weight: normal;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; padding: 0 15px; font-size: 10px; color: var(--text-muted); gap: 10px; margin-bottom: 10px;">
+                        <span>Sort X-Axis:</span>
+                        <a style="cursor: pointer; color: var(--text-main); text-decoration: none;" onclick="toggleSort('label')">Name ⇅</a>
+                        <a style="cursor: pointer; color: var(--text-main); text-decoration: none;" onclick="toggleSort('stepData_integration')">Integ. ⇅</a>
+                        <a style="cursor: pointer; color: var(--text-main); text-decoration: none;" onclick="toggleSort('stepData_storage')">Stor. ⇅</a>
+                        <a style="cursor: pointer; color: var(--text-main); text-decoration: none;" onclick="toggleSort('stepData_processing')">Proc. ⇅</a>
+                        <a style="cursor: pointer; color: var(--text-main); text-decoration: none;" onclick="toggleSort('stepData_analytics')">Ana. ⇅</a>
+                        <a style="cursor: pointer; color: var(--text-main); text-decoration: none;" onclick="toggleSort('stepData_governance')">Gov. ⇅</a>
+                    </div>
+                    <div class="kpi-card-body" style="flex: 1; padding: 0 15px 15px 15px; overflow-x: auto; overflow-y: hidden;">
+                        <div id="glb_cost_dist_vertical_chart" style="display: flex; gap: 16px; height: 100%; align-items: flex-end; min-width: min-content; padding-bottom: 5px;">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                 </div>
-                <div class="card" style="height: 300px; display: flex; flex-direction: column;">
-                    <div class="card-header">BI Cost Step Distribution Matrix</div>
-                    <div class="kpi-card-body" style="flex: 1; overflow-y: auto; padding: 0;">
-                        <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: right;">
-                            <thead style="position: sticky; top: 0; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
-                                <tr>
-                                    <th style="padding: 8px; text-align: left; border-bottom: 2px solid var(--border-light); cursor: pointer; user-select: none;" onclick="toggleSort('label')">Country ⇅</th>
-                                    <th style="padding: 8px; border-bottom: 2px solid var(--border-light); cursor: pointer; user-select: none;" onclick="toggleSort('stepData_integration')">Integ. ⇅</th>
-                                    <th style="padding: 8px; border-bottom: 2px solid var(--border-light); cursor: pointer; user-select: none;" onclick="toggleSort('stepData_storage')">Stor. ⇅</th>
-                                    <th style="padding: 8px; border-bottom: 2px solid var(--border-light); cursor: pointer; user-select: none;" onclick="toggleSort('stepData_processing')">Proc. ⇅</th>
-                                    <th style="padding: 8px; border-bottom: 2px solid var(--border-light); cursor: pointer; user-select: none;" onclick="toggleSort('stepData_analytics')">Ana. ⇅</th>
-                                    <th style="padding: 8px; border-bottom: 2px solid var(--border-light); cursor: pointer; user-select: none;" onclick="toggleSort('stepData_governance')">Gov. ⇅</th>
-                                </tr>
-                            </thead>
-                            <tbody id="glb_cost_dist_table_body">
-                                <!-- Populated by JS -->
-                            </tbody>
-                        </table>
+                
+                <div class="card" style="height: 380px; display: flex; flex-direction: column;">
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px;">Total BI Cost per Country</div>
+                    <div class="kpi-card-body" style="flex: 1; padding: 0 15px 15px 15px; overflow-y: auto;" id="glb_total_cost_chart">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
@@ -1010,7 +1011,7 @@
                             <button class="btn btn-outline" onclick="exportJson()">Export Global Platform JSON</button>
                             <button class="btn btn-outline" onclick="exportCsv()">Export Active Data to CSV</button>
                             <button class="btn btn-outline" style="border-color: var(--dhl-red); color: var(--dhl-red);"
-                                onclick="seedMockData()">Seed Global Costing Data</button>
+                                onclick="localStorage.clear(); seedMockData()">Seed Global Costing Data (V2)</button>
                             <button class="btn btn-outline" style="border-color: var(--dhl-yellow); color: #333;"
                                 onclick="seedMockMaturity()">Seed Mock Maturity Data</button>
                         </div>
@@ -2612,29 +2613,95 @@
 
             document.getElementById('global_matrix_tbody').innerHTML = matrixHTML;
 
-            // 3.5 Update Country Step Distribution Matrix
-            let distMatrixHtml = '';
-            matrixData.forEach(d => {
-                let sTotal = d.eur_total;
-                let cInteg = sTotal > 0 ? ((d.stepData.integration / sTotal) * 100).toFixed(1) + '%' : '-';
-                let cStor = sTotal > 0 ? ((d.stepData.storage / sTotal) * 100).toFixed(1) + '%' : '-';
-                let cProc = sTotal > 0 ? ((d.stepData.processing / sTotal) * 100).toFixed(1) + '%' : '-';
-                let cAna = sTotal > 0 ? ((d.stepData.analytics / sTotal) * 100).toFixed(1) + '%' : '-';
-                let cGov = sTotal > 0 ? ((d.stepData.governance / sTotal) * 100).toFixed(1) + '%' : '-';
+            // 3.5 Update Country Step Distribution Vertical Chart
+            let distBarsHtml = '';
+            let distLegHtml = '';
+            
+            const mainSteps = ['integration', 'storage', 'processing', 'analytics', 'governance'];
+            STEPS.filter(s => mainSteps.includes(s.id)).forEach((s, idx) => {
+                let val = gStepCosts[s.id] || 0;
+                let pct = gTotalCost > 0 ? (val / gTotalCost) * 100 : 0;
+                let color = COLORS[idx % COLORS.length];
+                distLegHtml += `<div style="display:flex; align-items:center; gap:4px;">
+                    <div style="width:10px;height:10px;background:${color};border-radius:2px;"></div>
+                    <span>${s.label.split(' ')[1]}: <b>${pct.toFixed(1)}%</b></span>
+                </div>`;
+            });
+            let legsEl = document.getElementById('glb_cost_dist_legend');
+            if (legsEl) legsEl.innerHTML = distLegHtml;
+
+            function buildPillar(label, totalVal, stepData, isTotal=false) {
+                let pInteg = totalVal > 0 ? (stepData.integration / totalVal) * 100 : 0;
+                let pStor  = totalVal > 0 ? (stepData.storage / totalVal) * 100 : 0;
+                let pProc  = totalVal > 0 ? (stepData.processing / totalVal) * 100 : 0;
+                let pAna   = totalVal > 0 ? (stepData.analytics / totalVal) * 100 : 0;
+                let pGov   = totalVal > 0 ? (stepData.governance / totalVal) * 100 : 0;
                 
-                distMatrixHtml += `
-                    <tr style="border-bottom: 1px solid var(--border-light);">
-                        <td style="padding: 6px 8px; text-align: left; font-weight: 600; color: var(--text-main);">${d.label}</td>
-                        <td style="padding: 6px 8px;">${cInteg}</td>
-                        <td style="padding: 6px 8px;">${cStor}</td>
-                        <td style="padding: 6px 8px;">${cProc}</td>
-                        <td style="padding: 6px 8px;">${cAna}</td>
-                        <td style="padding: 6px 8px;">${cGov}</td>
-                    </tr>
+                let segments = '';
+                if(pInteg > 0) segments += `<div style="height:${pInteg}%; background:${COLORS[0]}; width:100%; transition: height 0.3s;" onmouseenter="showTooltip(event, '${label}\\nIntegration: ${pInteg.toFixed(1)}%')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                if(pStor > 0) segments += `<div style="height:${pStor}%; background:${COLORS[1]}; width:100%; transition: height 0.3s;" onmouseenter="showTooltip(event, '${label}\\nStorage: ${pStor.toFixed(1)}%')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                if(pProc > 0) segments += `<div style="height:${pProc}%; background:${COLORS[2]}; width:100%; transition: height 0.3s;" onmouseenter="showTooltip(event, '${label}\\nProcessing: ${pProc.toFixed(1)}%')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                if(pAna > 0) segments += `<div style="height:${pAna}%; background:${COLORS[3]}; width:100%; transition: height 0.3s;" onmouseenter="showTooltip(event, '${label}\\nAnalytics: ${pAna.toFixed(1)}%')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                if(pGov > 0) segments += `<div style="height:${pGov}%; background:${COLORS[4]}; width:100%; transition: height 0.3s;" onmouseenter="showTooltip(event, '${label}\\nGovernance: ${pGov.toFixed(1)}%')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+                
+                if(totalVal === 0) segments = `<div style="height:100%; background:var(--border-light); width:100%;" onmouseenter="showTooltip(event, '${label}\\nNo Data')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>`;
+
+                let bgColor = isTotal ? 'var(--bg-light)' : 'transparent';
+                let fontWeight = isTotal ? '700' : '600';
+                let titleColor = isTotal ? 'var(--dhl-red)' : 'var(--text-main)';
+                let truncateParts = label.split(' (');
+                let shortLabel = truncateParts[0].length > 15 ? truncateParts[0].substring(0,12) + '...' : truncateParts[0];
+                if(isTotal) shortLabel = 'TOTAL';
+
+                return `
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; width: 60px; background: ${bgColor}; padding: 10px 5px 0 5px; border-radius: 6px;">
+                        <div style="display: flex; flex-direction: column-reverse; width: 40px; height: 100%; border-radius: 4px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                            ${segments}
+                        </div>
+                        <div style="margin-top: 10px; font-size: 10px; font-weight: ${fontWeight}; text-align: center; color: ${titleColor}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;" title="${label}">${shortLabel}</div>
+                    </div>
+                `;
+            }
+
+            let globalStepData = {
+                integration: gStepCosts['integration'],
+                storage: gStepCosts['storage'],
+                processing: gStepCosts['processing'],
+                analytics: gStepCosts['analytics'],
+                governance: gStepCosts['governance']
+            };
+            distBarsHtml += buildPillar('Global Total', gTotalCost, globalStepData, true);
+            distBarsHtml += `<div style="width: 2px; height: 80%; background: var(--border-light); margin: 0 5px; align-self: center; flex-shrink: 0;"></div>`;
+
+            matrixData.forEach(d => {
+                distBarsHtml += buildPillar(d.label, d.eur_total, d.stepData, false);
+            });
+
+            let chartEl = document.getElementById('glb_cost_dist_vertical_chart');
+            if (chartEl) chartEl.innerHTML = distBarsHtml;
+
+            // Total BI Cost per Country Chart
+            let totalCostHtml = '';
+            let sortedTotals = [...matrixData].sort((a,b) => b.eur_total - a.eur_total);
+            let maxTotal = sortedTotals.length > 0 ? sortedTotals[0].eur_total : 1;
+            
+            sortedTotals.forEach(d => {
+                let pctWidth = (d.eur_total / maxTotal) * 100;
+                let formattedCost = formatEur(d.eur_total, 0);
+                totalCostHtml += `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                            <span style="font-weight: 600; color: var(--text-main);">${d.label}</span>
+                            <span style="color: var(--text-muted);">${formattedCost}</span>
+                        </div>
+                        <div style="background: var(--bg-light); height: 8px; border-radius: 4px; width: 100%; overflow: hidden;">
+                            <div style="background: var(--dhl-red); width: ${pctWidth}%; height: 100%; border-radius: 4px; transition: width 0.3s;" onmouseenter="showTooltip(event, '${d.label}\\nTotal Cost: ${formattedCost}')" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()"></div>
+                        </div>
+                    </div>
                 `;
             });
-            let dTableEl = document.getElementById('glb_cost_dist_table_body');
-            if (dTableEl) dTableEl.innerHTML = distMatrixHtml;
+            let tcEl = document.getElementById('glb_total_cost_chart');
+            if (tcEl) tcEl.innerHTML = totalCostHtml;
 
             // 4. Update Country Data Checklist
             let checklistHtml = '';
@@ -2674,29 +2741,7 @@
             let clEl = document.getElementById('glb_country_checklist');
             if (clEl) clEl.innerHTML = checklistHtml;
 
-            // 5. Update BI Cost Distribution Chart
-            let distBarsHtml = '';
-            let distLegHtml = '';
-            STEPS.forEach((s, idx) => {
-                let val = gStepCosts[s.id];
-                let pct = gTotalCost > 0 ? (val / gTotalCost) * 100 : 0;
-                let color = COLORS[idx % COLORS.length];
-                if (pct > 0) {
-                    distBarsHtml += `<div style="width:${pct}%; background:${color}; height:100%; transition: width 0.3s;" title="${s.label}: ${pct.toFixed(1)}%"></div>`;
-                    distLegHtml += `<div style="display:flex; align-items:center; gap:4px;">
-                        <div style="width:10px;height:10px;background:${color};border-radius:2px;"></div>
-                        <span>${s.label.split(' ')[1]}: <b>${pct.toFixed(1)}%</b></span>
-                    </div>`;
-                }
-            });
-            if (gTotalCost === 0) {
-                distBarsHtml = `<div style="width:100%; background:var(--border-light); height:100%;"></div>`;
-                distLegHtml = `<div style="color:var(--text-muted);">No data available</div>`;
-            }
-            let barsEl = document.getElementById('glb_cost_dist_bars');
-            let legsEl = document.getElementById('glb_cost_dist_legend');
-            if (barsEl) barsEl.innerHTML = distBarsHtml;
-            if (legsEl) legsEl.innerHTML = distLegHtml;
+            // Note: BI Cost Distribution Chart logic is now unified upstairs in 3.5
 
             // Calculate Monthly Average Data Change strictly from the 24-month trend aggregation
             let avgDiff = "0.0%";
@@ -2722,7 +2767,7 @@
             // SPARKLINE RENDERING (Looker Studio Style)
             // ----------------------------------------
             // We chart the trailing 12 months for visual crispness
-            let s_cost = [], s_cps = [], s_cpu = [], s_dsps = [], s_bivsit = [], s_bivsrev = [];
+            let s_cost = [], s_cps = [], s_cpu = [], s_dsps = [], s_bivsit = [], s_bivsrev = [], s_users = [];
 
             for(let i=0; i<24; i++) {
                 let g = sparkTrends[i];
@@ -2733,6 +2778,7 @@
                     s_dsps.push(g.ships > 0 ? (g.data / g.ships) : 0);
                     s_bivsit.push(g.it_cost > 0 ? (g.cost / g.it_cost) : 0);
                     s_bivsrev.push(g.revenue > 0 ? (g.cost / g.revenue) : 0);
+                    s_users.push(g.users);
                 }
             }
             
@@ -2747,6 +2793,7 @@
             drawSparkline('spark_total', s_cost, '#D40511', sparkLabels, '€'); 
             drawSparkline('spark_cps', s_cps, '#20C997', sparkLabels, '€'); 
             drawSparkline('spark_cpu', s_cpu, '#3B82F6', sparkLabels, '€'); 
+            drawSparkline('spark_users', s_users, '#EC4899', sparkLabels, ''); 
             drawSparkline('spark_dsps', s_dsps, '#8B5CF6', sparkLabels, 'TB'); 
             drawSparkline('spark_bivsit', s_bivsit, '#F59E0B', sparkLabels, '%');
             drawSparkline('spark_bivsrev', s_bivsrev, '#D40511', sparkLabels, '%');
@@ -3101,10 +3148,11 @@
         // --- 7. MOCK SEEDING ENGINE ---
         function seedMockData() {
 
-            let baseShipments = { 'AU': 1200000, 'BNLX': 2500000, 'CBS': 800000, 'CZ PPL': 1500000, 'IN': 3500000, 'PL': 1800000, 'ES': 2200000, 'TH/MY': 1100000, 'TR': 3000000, 'US': 5000000, 'BRS': 500000 };
+            let baseShipments = { 'AU': 1200000, 'BNLX': 2500000, 'CBS': 800000, 'CZ': 1500000, 'IN': 3500000, 'PL': 1800000, 'ES': 2200000, 'TH/MY': 1100000, 'TR': 3000000, 'US': 5000000, 'BRS': 500000, 'UK': 4000000 };
 
             COUNTRIES.forEach(c => {
-                let s_base = baseShipments[c] || 1000000;
+                let code = c.split(' ')[0];
+                let s_base = baseShipments[code] || 1000000;
                 let it_base = s_base * 45 * 0.1; // 10% of revenue as IT cost mock
 
                 let trendArray = [];
@@ -3129,12 +3177,24 @@
 
                     // Compute EUR steps
                     let bi_base = row.it_cost * 0.1; // BI is 10% of IT
-                    row.eur_integration = bi_base * 0.2;
-                    row.eur_storage = bi_base * 0.3;
-                    row.eur_processing = bi_base * 0.3;
-                    row.eur_analytics = bi_base * 0.15;
-                    row.eur_governance = bi_base * 0.025;
-                    row.eur_operations = bi_base * 0.025;
+                    let wInt = 0.2, wSto = 0.3, wPro = 0.3, wAna = 0.15, wGov = 0.05;
+                    
+                    if (code === 'TR' || code === 'ES' || code === 'CZ') { 
+                        wInt = 0.10; wSto = 0.10; wPro = 0.15; wAna = 0.60; wGov = 0.05; // BI Heavy
+                    } else if (code === 'IN' || code === 'PL') { 
+                        wInt = 0.45; wSto = 0.20; wPro = 0.20; wAna = 0.10; wGov = 0.05; // ETL Heavy
+                    } else if (code === 'US' || code === 'BNLX' || code === 'UK') { 
+                        wInt = 0.15; wSto = 0.20; wPro = 0.20; wAna = 0.15; wGov = 0.30; // Gov Heavy
+                    } else if (code === 'AU' || code === 'CBS' || code === 'TH/MY' || code === 'BRS') { 
+                        wInt = 0.10; wSto = 0.60; wPro = 0.10; wAna = 0.15; wGov = 0.05; // Storage Heavy
+                    }
+
+                    row.eur_integration = bi_base * wInt;
+                    row.eur_storage = bi_base * wSto;
+                    row.eur_processing = bi_base * wPro;
+                    row.eur_analytics = bi_base * wAna;
+                    row.eur_governance = bi_base * wGov;
+                    row.eur_operations = 0;
 
                     trendArray.push(row);
                 }
@@ -3422,6 +3482,24 @@
         // Boot
         window.onload = init;
 
+    </script>
+    <!-- Custom Floating Tooltip -->
+    <div id="hover_tooltip" style="position: absolute; display: none; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 11px; pointer-events: none; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.3); white-space: pre-line; line-height: 1.4; transform: translate(-50%, -100%); margin-top: -10px;"></div>
+    <script>
+        const tooltipEl = document.getElementById('hover_tooltip');
+        function showTooltip(e, text) {
+            tooltipEl.innerHTML = text.replace(/\\n/g, '<br>');
+            tooltipEl.style.display = 'block';
+            tooltipEl.style.left = e.pageX + 'px';
+            tooltipEl.style.top = e.pageY + 'px';
+        }
+        function moveTooltip(e) {
+            tooltipEl.style.left = e.pageX + 'px';
+            tooltipEl.style.top = e.pageY + 'px';
+        }
+        function hideTooltip() {
+            tooltipEl.style.display = 'none';
+        }
     </script>
 </body>
 
