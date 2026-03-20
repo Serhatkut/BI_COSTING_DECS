@@ -229,6 +229,74 @@
             font-weight: 500;
         }
 
+        
+        
+        /* --- DASHBOARD MATURITY ROWS --- */
+        .mat-dash-row {
+            display: flex;
+            background: white;
+            min-height: 60px;
+            align-items: stretch;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .mat-dash-text {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .mat-dash-title {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+            font-size: 12px;
+        }
+        .mat-dash-score {
+            width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* --- WIZARD CSS --- */
+        .maturity-screen { display: none; animation: fadeIn 0.3s ease-out forwards; }
+        .maturity-screen.active { display: block; }
+
+        .wizard-step { display: none; animation: fadeIn 0.3s ease-out forwards; }
+        .wizard-step.active { display: block; }
+
+        .radio-wizard { display: flex; flex-direction: column; gap: 8px; }
+        .radio-wizard .radio-option {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .radio-wizard .radio-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .radio-wizard input[type="radio"]:checked + .radio-label {
+            font-weight: 600;
+        }
+        .radio-wizard input[type="radio"]:checked {
+            accent-color: var(--chart-1);
+        }
+        /* Highlight option container when selected */
+        .radio-wizard label:has(input[type="radio"]:checked) {
+            background: rgba(32, 201, 151, 0.08);
+            border-color: var(--chart-1);
+        }
+
         /* --- VIEWS --- */
         .view-container {
             display: none;
@@ -584,9 +652,12 @@
             </div>
             <div class="filter-group" id="month_filter_container">
                 <label>Review Period</label>
-                <select id="global_month_select" onchange="handleMonthChange()">
-                    <option value="All_Active">Current State</option>
+                <select id="global_month_select" onchange="handleMonthChange()" style="margin-bottom: 4px;">
+                    <option value="All_Active">Most Recent Data</option>
                 </select>
+                <div style="font-size: 10px; color: var(--text-muted); line-height: 1.2; max-width: 140px;">
+                    Aggregates the latest available month submitted per country.
+                </div>
             </div>
         </div>
 
@@ -603,12 +674,12 @@
         </header>
 
         <!-- VIEW: GLOBAL DASHBOARD -->
-        <div id="v_global" class="view-container">
+        <div id="v_global" class="view-container active">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <div style="font-size: 16px; font-weight: 600; color: var(--text-main);">Network Benchmarks</div>
             </div>
 
-            <div class="grid-3" style="margin-bottom: 12px;">
+            <div class="grid-4" style="margin-bottom: 24px;">
                 <div class="kpi-card accent-red">
                     <div class="kpi-label">Total BI Cost</div>
                     <div class="kpi-value" id="glb_kpi_total">€0</div>
@@ -624,9 +695,6 @@
                     <div class="kpi-value" id="glb_kpi_cpu">€0.00</div>
                     <canvas id="spark_cpu" class="sparkline"></canvas>
                 </div>
-            </div>
-
-            <div class="grid-4" style="margin-bottom: 24px;">
                 <div class="kpi-card">
                     <div class="kpi-label">Active Application Users</div>
                     <div class="kpi-value" id="glb_kpi_users">0</div>
@@ -652,31 +720,67 @@
                 </div>
             </div>
 
-            <!-- MATURITY SCORES -->
-            <div style="font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; margin-top: 10px;">Governance Maturity (Latest Assessments)</div>
+            <!-- MATURITY KPIs -->
             <div class="grid-3" style="margin-bottom: 24px;">
-                <div class="kpi-card" style="border-top: 4px solid var(--chart-1);">
-                    <div class="kpi-label">Solid Foundations</div>
-                    <div class="kpi-value" id="glb_kpi_mat_1">0.0 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span></div>
+                <div class="kpi-card card">
+                    <div class="kpi-label" style="color: var(--text-main);">Solid Foundations Average</div>
+                    <div class="kpi-value" id="glb_kpi_mat_p1">-</div>
                 </div>
-                <div class="kpi-card" style="border-top: 4px solid var(--chart-3);">
-                    <div class="kpi-label">Optimized Analytics Landscape</div>
-                    <div class="kpi-value" id="glb_kpi_mat_2">0.0 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span></div>
+                <div class="kpi-card card">
+                    <div class="kpi-label" style="color: var(--text-main);">Optimized Analytics Average</div>
+                    <div class="kpi-value" id="glb_kpi_mat_p2">-</div>
                 </div>
-                <div class="kpi-card" style="border-top: 4px solid var(--dhl-red);">
-                    <div class="kpi-label">Support for Growth</div>
-                    <div class="kpi-value" id="glb_kpi_mat_3">0.0 <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span></div>
+                <div class="kpi-card card">
+                    <div class="kpi-label" style="color: var(--text-main);">Support for Growth Average</div>
+                    <div class="kpi-value" id="glb_kpi_mat_p3">-</div>
+                </div>
+            </div>
+
+            <!-- MATURITY SCORES GRANULAR -->
+            <div style="font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 12px; margin-top: 10px;">Data-Driven Governance Maturity</div>
+            <div class="grid-3" style="margin-bottom: 24px; gap: 10px;">
+                <!-- PILLAR 1 -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="background: #9fa6b2; color: white; text-align: center; padding: 10px; font-weight: 700; font-size: 14px; text-transform: uppercase;">Solid Foundations</div>
+                    <div style="font-size: 11px; text-align: center; font-style: italic; color: var(--text-muted); background: white; padding: 6px; border-bottom: 1px solid var(--border-light);">Foundational capabilities to ensure secure, standardized, and well-governed data structures</div>
+                    <div id="glb_mat_q1" class="mat-dash-row"></div>
+                    <div id="glb_mat_q2" class="mat-dash-row"></div>
+                    <div id="glb_mat_q3" class="mat-dash-row"></div>
+                    <div id="glb_mat_q4" class="mat-dash-row"></div>
+                </div>
+                <!-- PILLAR 2 -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="background: #9fa6b2; color: white; text-align: center; padding: 10px; font-weight: 700; font-size: 14px; text-transform: uppercase;">Optimized Analytics Landscape</div>
+                    <div style="font-size: 11px; text-align: center; font-style: italic; color: var(--text-muted); background: white; padding: 6px; border-bottom: 1px solid var(--border-light);">Capabilities required for integrated, insight-rich granular business analytics powered by a unified data layer.</div>
+                    <div id="glb_mat_q5" class="mat-dash-row"></div>
+                    <div id="glb_mat_q6" class="mat-dash-row"></div>
+                    <div id="glb_mat_q7" class="mat-dash-row"></div>
+                    <div id="glb_mat_q8" class="mat-dash-row"></div>
+                </div>
+                <!-- PILLAR 3 -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="background: #9fa6b2; color: white; text-align: center; padding: 10px; font-weight: 700; font-size: 14px; text-transform: uppercase;">Support For Growth</div>
+                    <div style="font-size: 11px; text-align: center; font-style: italic; color: var(--text-muted); background: white; padding: 6px; border-bottom: 1px solid var(--border-light);">Governance and performance routines to scale and sustain a data-driven culture.</div>
+                    <div id="glb_mat_q9" class="mat-dash-row"></div>
+                    <div id="glb_mat_q10" class="mat-dash-row"></div>
+                    <div id="glb_mat_q11" class="mat-dash-row"></div>
+                    <div id="glb_mat_q12" class="mat-dash-row"></div>
                 </div>
             </div>
 
             <div class="grid-2" style="margin-bottom: 24px;">
-                <div class="card" style="height: 400px;">
-                    <div class="card-header">Cost by Country Matrix</div>
-                    <canvas id="cvs_global_costs"></canvas>
+                <div class="card" style="height: 300px;">
+                    <div class="card-header">BI Cost Distribution by Step</div>
+                    <div class="kpi-card-body" style="height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px;">
+                        <div id="glb_cost_dist_bars" style="display: flex; height: 36px; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+                        <div id="glb_cost_dist_legend" style="display: flex; gap: 15px; font-size: 12px; flex-wrap: wrap; justify-content: center;"></div>
+                    </div>
                 </div>
-                <div class="card" style="height: 400px;">
-                    <div class="card-header">Network 24-Month Trend</div>
-                    <canvas id="cvs_global_trend"></canvas>
+                <div class="card" style="height: 300px;">
+                    <div class="card-header">Data Submission Checklist</div>
+                    <div class="kpi-card-body" style="height: 100%; overflow-y: auto; padding: 10px;">
+                        <div id="glb_country_checklist" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                    </div>
                 </div>
             </div>
 
@@ -695,6 +799,9 @@
                                 <th class="sort-header sort-icon" style="padding: 10px;" onclick="toggleSort('cpu')">Cost / User</th>
                                 <th class="sort-header sort-icon" style="padding: 10px;" onclick="toggleSort('dsps')">Data Size / Ship</th>
                                 <th class="sort-header sort-icon" style="padding: 10px;" onclick="toggleSort('it_pct')">BI vs IT %</th>
+                                <th style="padding: 10px; color: var(--dhl-red);">Solid Found.</th>
+                                <th style="padding: 10px; color: var(--dhl-red);">Opt. Ana.</th>
+                                <th style="padding: 10px; color: var(--dhl-red);">Supp. Grw.</th>
                             </tr>
                         </thead>
                         <tbody id="global_matrix_tbody">
@@ -884,212 +991,324 @@
             </div>
         </div>
 
-        <!-- VIEW: MATURITY ASSESSMENT -->
+                <!-- VIEW: MATURITY ASSESSMENT -->
         <div id="v_maturity" class="view-container">
-            <div class="card" style="background: linear-gradient(135deg, #1E202B 0%, #2A2E3D 100%); color: white; border: none;">
-                <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                    <div class="brand-accent" style="width: 4px; height: 24px; background: var(--dhl-red);"></div> Data-Driven Governance Maturity Assessment
-                </div>
-                <p style="font-size: 14px; opacity: 0.8; line-height: 1.5; max-width: 900px;">
-                    Evaluate your organization's data-driven governance capabilities across three critical pillars: Solid Foundations, Optimized Analytics Landscape, and Support for Growth.
-                </p>
-            </div>
-
-            <div class="card">
-                <div class="card-header">1. Respondent Metadata</div>
-                <div class="grid-2">
-                    <div class="form-group" style="display: none;">
-                        <!-- Country mapped automatically from activeContext sidebar -->
-                        <input type="hidden" id="mat_country" value="">
+            <!-- START SCREEN -->
+            <div id="mat_screen_start" class="maturity-screen active">
+                <div class="card" style="background: linear-gradient(135deg, #1E202B 0%, #2A2E3D 100%); color: white; border: none;">
+                    <div style="font-size: 24px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <div class="brand-accent" style="width: 4px; height: 24px; background: var(--dhl-red);"></div> Data-Driven Governance Maturity Assessment
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Respondent Name</label>
-                        <input type="text" id="mat_name" class="form-input" placeholder="e.g. John Doe">
-                    </div>
-                </div>
-            </div>
-
-            <!-- PILLAR 1: SOLID FOUNDATIONS -->
-            <div class="maturity-card card" style="border-top: 4px solid var(--chart-1);">
-                <div class="pillar-header" style="color: var(--chart-1);">SOLID FOUNDATIONS</div>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Foundational capabilities to ensure secure, standardized, and well-governed data structures</p>
-                
-                <!-- Q1 -->
-                <div class="question-block">
-                    <div class="question-title">Q1: 🔐 Data Security & Access Control</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Role-based access, authorization, audit trails, and encryption aligned with DHL standards.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q1" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q1" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q1" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q1" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q1" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
-                    </div>
+                    <p style="font-size: 14px; opacity: 0.8; line-height: 1.5; max-width: 900px;">
+                        Evaluate your organization's data-driven governance capabilities across three critical pillars: Solid Foundations, Optimized Analytics Landscape, and Support for Growth.
+                    </p>
                 </div>
 
-                <!-- Q2 -->
-                <div class="question-block">
-                    <div class="question-title">Q2: 🏗️ Data Architecture & Integration</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Visibility into architecture, structured ETL pipelines, and integrated infrastructure.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q2" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q2" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q2" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q2" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q2" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
-                    </div>
-                </div>
-
-                <!-- Q3 -->
-                <div class="question-block">
-                    <div class="question-title">Q3: 🧩 Standardized Data Structures & Modeling</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Common definitions, consistent schemas, and data model alignment across systems.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q3" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q3" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q3" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q3" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q3" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
-                    </div>
-                </div>
-
-                <!-- Q4 -->
-                <div class="question-block">
-                    <div class="question-title">Q4: 📇 Master & Reference Data Management</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Governance and stewardship for core master data (e.g., customers, sites, vehicles, services).</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q4" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q4" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q4" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q4" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q4" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                <div class="card" style="margin-top: 20px; text-align: center; padding: 40px;">
+                    <h3 style="margin-bottom: 20px;">Begin Assessment</h3>
+                    <button class="btn btn-primary" onclick="startMaturityWizard()">Start New Assessment</button>
+                    
+                    <div style="margin-top: 40px; border-top: 1px dashed var(--border-light); padding-top: 30px;">
+                        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 15px;">Already started? Enter your Draft Key to resume.</p>
+                        <div style="display: flex; justify-content: center; gap: 10px; align-items: center;">
+                            <input type="text" id="mat_draft_key" class="form-input" style="max-width: 200px; text-transform: uppercase; text-align: center; font-weight: bold; letter-spacing: 2px;" placeholder="MAT-XXXX" maxlength="8">
+                            <button class="btn btn-secondary" onclick="resumeMaturityDraft()">Resume Draft</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PILLAR 2: OPTIMIZED ANALYTICS LANDSCAPE -->
-            <div class="maturity-card card" style="border-top: 4px solid var(--chart-3);">
-                <div class="pillar-header" style="color: var(--chart-3);">OPTIMIZED ANALYTICS LANDSCAPE</div>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Capabilities required for integrated, insight-rich granular business analytics powered by a unified data layer.</p>
-                
-                <!-- Q5 -->
-                <div class="question-block">
-                    <div class="question-title">Q5: 📊 Consistent and Scalable BI Platform</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">A single, governed BI environment that enables standardized dashboards, certified KPIs, and role-based access.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q5" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q5" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q5" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q5" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q5" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+            <!-- WIZARD SCREEN -->
+            <div id="mat_screen_wizard" class="maturity-screen" style="display: none;">
+                <div class="card" style="margin-bottom: 20px; padding: 15px 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div style="font-weight: 600; font-size: 14px;">Step <span id="mat_step_current">1</span> of 13</div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; border-color: transparent; background: rgba(255,255,255,0.05);" onclick="saveMaturityDraft()">Save & Continue Later</button>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
+                        <div id="mat_progress_bar" style="height: 100%; width: 7.6%; background: var(--dhl-yellow); transition: width 0.3s ease;"></div>
                     </div>
                 </div>
 
-                <!-- Q6 -->
-                <div class="question-block">
-                    <div class="question-title">Q6: 🧊 Unified and Granular Shipment Level Data (Golden Layer)</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">A centralized shipment-level event-based data source enabling historical Descriptive insights and real-time operational Diagnostics with at least 2 years of data.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q6" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q6" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q6" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q6" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q6" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                <!-- Step 1: Context -->
+                <div id="mat_step_1" class="wizard-step active">
+                    <div class="card">
+                        <div class="card-header" style="color: var(--text-main);">1. Respondent Metadata</div>
+                        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Please define the scope and timing of this assessment before proceeding to the questions.</p>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">Review Period</label>
+                                <select id="mat_disp_month" class="form-input" onchange="syncMaturityContext()"></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Target Network</label>
+                                <select id="mat_disp_country" class="form-input" onchange="syncMaturityContext()"></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Respondent Name</label>
+                                <input type="text" id="mat_name" class="form-input" placeholder="e.g. John Doe">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Q7 -->
-                <div class="question-block">
-                    <div class="question-title">Q7: 🔮 Predictive Analytics (AI/ML-Based Forecasting)</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Use of AI/ML models to forecast volume, performance deviations, customer churn, or other trends.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q7" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q7" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q7" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q7" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q7" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                <!-- Step 2: Q1 -->
+                <div id="mat_step_2" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-1);">
+                        <div class="pillar-header" style="color: var(--chart-1);">SOLID FOUNDATIONS</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q1: 🔐 Data Security & Access Control</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Role-based access, authorization, audit trails, and encryption aligned with DHL standards.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q1" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q1" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q1" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q1" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q1" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Q8 -->
-                <div class="question-block">
-                    <div class="question-title">Q8: 🤖 Prescriptive Analytics (AI-Based Recommendations)</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">AI-driven tools provide actionable recommendations for operations, pricing, routing, or workforce planning.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q8" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q8" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q8" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q8" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q8" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                <!-- Step 3: Q2 -->
+                <div id="mat_step_3" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-1);">
+                        <div class="pillar-header" style="color: var(--chart-1);">SOLID FOUNDATIONS</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q2: 🏗️ Data Architecture & Integration</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Visibility into architecture, structured ETL pipelines, and integrated infrastructure.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q2" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q2" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q2" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q2" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q2" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Step 4: Q3 -->
+                <div id="mat_step_4" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-1);">
+                        <div class="pillar-header" style="color: var(--chart-1);">SOLID FOUNDATIONS</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q3: 🧩 Standardized Data Structures & Modeling</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Common definitions, consistent schemas, and data model alignment across systems.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q3" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q3" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q3" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q3" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q3" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Q4 -->
+                <div id="mat_step_5" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-1);">
+                        <div class="pillar-header" style="color: var(--chart-1);">SOLID FOUNDATIONS</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q4: 📇 Master & Reference Data Management</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Governance and stewardship for core master data (e.g., customers, sites, vehicles, services).</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q4" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q4" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q4" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q4" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q4" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Q5 -->
+                <div id="mat_step_6" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-3);">
+                        <div class="pillar-header" style="color: var(--chart-3);">OPTIMIZED ANALYTICS LANDSCAPE</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q5: 📊 Consistent and Scalable BI Platform</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">A single, governed BI environment that enables standardized dashboards, certified KPIs, and role-based access.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q5" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q5" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q5" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q5" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q5" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 7: Q6 -->
+                <div id="mat_step_7" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-3);">
+                        <div class="pillar-header" style="color: var(--chart-3);">OPTIMIZED ANALYTICS LANDSCAPE</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q6: 🧊 Unified and Granular Shipment Level Data (Golden Layer)</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">A centralized shipment-level event-based data source robust historical and real-time insights.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q6" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q6" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q6" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q6" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q6" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 8: Q7 -->
+                <div id="mat_step_8" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-3);">
+                        <div class="pillar-header" style="color: var(--chart-3);">OPTIMIZED ANALYTICS LANDSCAPE</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q7: 🔮 Predictive Analytics (AI/ML-Based Forecasting)</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Use of AI/ML models to forecast volume, performance deviations, customer churn, or other trends.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q7" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q7" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q7" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q7" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q7" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 9: Q8 -->
+                <div id="mat_step_9" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--chart-3);">
+                        <div class="pillar-header" style="color: var(--chart-3);">OPTIMIZED ANALYTICS LANDSCAPE</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q8: 🤖 Prescriptive Analytics (AI-Based Recommendations)</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">AI-driven tools provide actionable recommendations for operations, pricing, routing, or workforce planning.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q8" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q8" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q8" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q8" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q8" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 10: Q9 -->
+                <div id="mat_step_10" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--dhl-red);">
+                        <div class="pillar-header" style="color: var(--dhl-red);">SUPPORT FOR GROWTH</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q9: 📋 Structured Performance Reviews with Action Tracking</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Embedded governance routines (e.g., QCP, First Choice) with tracked actions and transparent follow-up.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q9" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q9" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q9" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q9" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q9" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 11: Q10 -->
+                <div id="mat_step_11" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--dhl-red);">
+                        <div class="pillar-header" style="color: var(--dhl-red);">SUPPORT FOR GROWTH</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q10: ⚖️ Harmonized KPIs & Minimum Control Checks Points</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Quality KPIs aligned with GHO supported by underlying operational and financial control logic.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q10" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q10" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q10" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q10" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q10" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 12: Q11 -->
+                <div id="mat_step_12" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--dhl-red);">
+                        <div class="pillar-header" style="color: var(--dhl-red);">SUPPORT FOR GROWTH</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q11: 🌐 Multi-Dimensional & Cross-Domain KPI Views</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Dashboards enable cross-sectional analysis (e.g., service quality vs profitability) with side-by-side benchmarking.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q11" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q11" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q11" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q11" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q11" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 13: Q12 -->
+                <div id="mat_step_13" class="wizard-step" style="display: none;">
+                    <div class="maturity-card card" style="border-top: 4px solid var(--dhl-red);">
+                        <div class="pillar-header" style="color: var(--dhl-red);">SUPPORT FOR GROWTH</div>
+                        <div class="question-block" style="margin-bottom: 0; border: none; padding-bottom: 0;">
+                            <div class="question-title">Q12: 📶 Hierarchical, Aligned Dashboards (CEO to Site Level)</div>
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; margin-top: -6px;">Role-specific dashboards accessible from operational to executive level, aligned to unified KPIs.</p>
+                            <div class="radio-group radio-wizard">
+                                <label class="radio-option"><input type="radio" name="q12" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
+                                <label class="radio-option"><input type="radio" name="q12" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
+                                <label class="radio-option"><input type="radio" name="q12" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
+                                <label class="radio-option"><input type="radio" name="q12" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
+                                <label class="radio-option"><input type="radio" name="q12" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nav Buttons -->
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <button id="btn_mat_prev" class="btn btn-secondary" onclick="prevMaturityStep()" style="visibility: hidden; font-weight: 600; padding: 12px 24px;">← Previous</button>
+                    <button id="btn_mat_next" class="btn btn-primary" onclick="nextMaturityStep()" style="font-weight: 600; padding: 12px 24px;">Next →</button>
+                    <button id="btn_mat_complete" class="btn btn-primary" onclick="completeMaturityAssessment()" style="display: none; font-weight: 600; padding: 12px 24px; background-color: var(--chart-1);">Complete & Submit ✓</button>
                 </div>
             </div>
 
-            <!-- PILLAR 3: SUPPORT FOR GROWTH -->
-            <div class="maturity-card card" style="border-top: 4px solid var(--dhl-red);">
-                <div class="pillar-header" style="color: var(--dhl-red);">SUPPORT FOR GROWTH</div>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Governance and performance routines to scale and sustain a data-driven culture.</p>
-                
-                <!-- Q9 -->
-                <div class="question-block">
-                    <div class="question-title">Q9: 📋 Structured Performance Reviews with Action Tracking</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Embedded governance routines (e.g., QCP, First Choice) with tracked actions and transparent follow-up.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q9" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q9" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q9" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q9" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q9" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
+            <!-- COMPLETE SCREEN -->
+            <div id="mat_screen_complete" class="maturity-screen" style="display: none;">
+                <div class="card" style="text-align: center; padding: 60px 40px; border-top: 4px solid var(--chart-1);">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+                    <h2 style="color: var(--text-main); margin-bottom: 15px;">Assessment Complete!</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 15px;">Thank you. Your maturity assessment has been securely finalized and aggregated into the global dashboard.</p>
+                    
+                    <div class="grid-3" style="text-align: left; margin-bottom: 40px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <div class="card" style="background: rgba(255,255,255,0.02); border-left: 4px solid var(--chart-1);">
+                            <div style="font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Solid Foundations</div>
+                            <div id="mat_res_p1" style="font-size: 32px; font-weight: 700; color: var(--chart-1);">0.0</div>
+                        </div>
+                        <div class="card" style="background: rgba(255,255,255,0.02); border-left: 4px solid var(--chart-3);">
+                            <div style="font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Optimized Analytics</div>
+                            <div id="mat_res_p2" style="font-size: 32px; font-weight: 700; color: var(--chart-3);">0.0</div>
+                        </div>
+                        <div class="card" style="background: rgba(255,255,255,0.02); border-left: 4px solid var(--dhl-red);">
+                            <div style="font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Support for Growth</div>
+                            <div id="mat_res_p3" style="font-size: 32px; font-weight: 700; color: var(--dhl-red);">0.0</div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="switchView('v_global')" style="padding: 14px 30px; font-size: 16px;">Return to Dashboard</button>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-secondary" onclick="showMaturityScreen('mat_screen_start')" style="background: transparent; border: none; font-size: 13px;">Start Another Assessment</button>
                     </div>
                 </div>
-
-                <!-- Q10 -->
-                <div class="question-block">
-                    <div class="question-title">Q10: ⚖️ Harmonized KPIs & Minimum Control Checks Points</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">QCP, FirstChoice Service Quality, Exceptions, and Billing Accuracy KPI's aligned with GHO consistent across domains, and supported by operational and financial control logic like EDD, scan events, and billing validation.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q10" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q10" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q10" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q10" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q10" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
-                    </div>
-                </div>
-
-                <!-- Q11 -->
-                <div class="question-block">
-                    <div class="question-title">Q11: 🌐 Multi-Dimensional & Cross-Domain KPI Views (Customer / Site / Region / Side-by-Side 360)</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Dashboards enable cross-sectional analysis (e.g., service quality vs. customer satisfaction score vs profitability) with side-by-side benchmarking.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q11" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q11" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q11" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q11" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q11" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
-                    </div>
-                </div>
-
-                <!-- Q12 -->
-                <div class="question-block">
-                    <div class="question-title">Q12: 📶 Hierarchical, Aligned Dashboards (CEO to Site Level)</div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; margin-top: -6px;">Role-specific dashboards accessible from operational to executive level, aligned to unified KPIs.</p>
-                    <div class="radio-group">
-                        <label class="radio-option"><input type="radio" name="q12" value="1"><span class="radio-label"><span class="radio-score">1 - Not Present:</span> Capability does not exist or is not practiced at all.</span></label>
-                        <label class="radio-option"><input type="radio" name="q12" value="2"><span class="radio-label"><span class="radio-score">2 - Initial:</span> Capability exists in a very limited or experimental form.</span></label>
-                        <label class="radio-option"><input type="radio" name="q12" value="3"><span class="radio-label"><span class="radio-score">3 - Developing:</span> Capability is partially implemented with room for standardization.</span></label>
-                        <label class="radio-option"><input type="radio" name="q12" value="4"><span class="radio-label"><span class="radio-score">4 - Established:</span> Capability is well-defined, standardized, and consistently applied.</span></label>
-                        <label class="radio-option"><input type="radio" name="q12" value="5"><span class="radio-label"><span class="radio-score">5 - Fully Integrated:</span> Capability is embedded into operations, continuously improved, and optimized.</span></label>
-                    </div>
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                <button id="btn_save_maturity" class="btn btn-primary" style="padding: 12px 24px; font-size: 15px;" onclick="saveMaturityAssessment()">Save Maturity Assessment</button>
             </div>
         </div>
 
+
         <!-- VIEW: FRAMEWORK GUIDANCE -->
-        <div id="v_guidance" class="view-container active">
+        <div id="v_guidance" class="view-container">
             <div class="card"
                 style="background: linear-gradient(135deg, #1E202B 0%, #2A2E3D 100%); color: white; border: none;">
                 <div
@@ -1401,12 +1620,10 @@
                     <div style="font-size: 10px; color: var(--text-muted);">V2.1.0 Architecture • Global BI Governance</div>
                 </div>
             </footer>
-        </div>
-
     </main>
 
     <script>
-        // --- 1. CORE DATA DICTIONARY ---
+        // --- DATA & STATE ---
         const STEPS = [
             { id: 'integration', label: 'A. Integration', icon: '🔄', def: 'Moving data from source systems. Examples: ADF, Glue, Talend, ODI, Pentaho, Informatica, SAP Data Services.' },
             { id: 'storage', label: 'B. Storage', icon: '🗄️', def: 'Persisting data in operational data stores or lakes. Examples: ADLS Gen2, Snowflake, S3, Oracle Exadata, SAP HANA, SQL Server.' },
@@ -1444,57 +1661,243 @@
         let sparkStore = {}; // will hold data arrays and month labels for tooltips
 
         // --- 1.5 STATE MANAGEMENT ---
-        function loadMaturityAssessment() {
-            if (activeContext === 'Global' || !activeContext) {
-                // Clear the form and disable save if Global
-                document.getElementById('mat_name').value = '';
-                for (let i = 1; i <= 12; i++) {
-                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
-                    if (checked) checked.checked = false;
+        function populateMaturityDropdowns() {
+            let mSel = document.getElementById('mat_disp_month');
+            let cSel = document.getElementById('mat_disp_country');
+            
+            if (mSel.options.length === 0) {
+                // Populate Months (exclude All_Active)
+                for (let m = 0; m < 24; m++) {
+                    let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                    let mStr = monthNames[m % 12];
+                    let yStr = m < 12 ? "2025" : "2026";
+                    let dateVal = `${mStr} ${yStr}`;
+                    let o = document.createElement('option');
+                    o.value = o.innerText = dateVal;
+                    mSel.appendChild(o);
                 }
-                return;
             }
-            
-            let selectedMonth = document.getElementById('global_month_select').value;
-            let histStr = localStorage.getItem(`bi_cost_maturity_history_${activeContext}`);
-            let history = histStr ? JSON.parse(histStr) : [];
-            
-            // Find specific month
-            let record = history.find(h => h.month === selectedMonth);
-            
-            if (record) {
-                document.getElementById('mat_name').value = record.respondent || '';
-                for (let i = 1; i <= 12; i++) {
-                    let score = record.scores[`q${i}`];
-                    if (score) {
-                        let radio = document.querySelector(`input[name="q${i}"][value="${score}"]`);
-                        if (radio) radio.checked = true;
-                    }
-                }
-            } else {
-                // Clear form if no record for this month
-                document.getElementById('mat_name').value = '';
-                for (let i = 1; i <= 12; i++) {
-                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
-                    if (checked) checked.checked = false;
-                }
+            if (cSel.options.length === 0) {
+                // Populate Countries
+                COUNTRIES.sort().forEach(c => {
+                    let o = document.createElement('option');
+                    o.value = o.innerText = c;
+                    cSel.appendChild(o);
+                });
             }
         }
 
-        function saveMaturityAssessment() {
-            let country = activeContext;
-            if (country === 'Global' || !country) {
-                alert("Please select a specific country in the left sidebar to save an assessment.");
+        function syncMaturityContext() {
+            let selectedCountry = document.getElementById('mat_disp_country').value;
+            let selectedMonthLocal = document.getElementById('mat_disp_month').value;
+            
+            // Sync up to global sidebar if needed
+            let globalMonthEl = document.getElementById('global_month_select');
+            let globalCountryEl = document.getElementById('header_country_select');
+            
+            if (globalCountryEl.value !== selectedCountry) {
+                globalCountryEl.value = selectedCountry;
+                activeContext = selectedCountry;
+                handleContextChange(selectedCountry, false); // pass false to avoid loop if wanted, but fine
+            }
+            if (globalMonthEl.value !== selectedMonthLocal) {
+                globalMonthEl.value = selectedMonthLocal;
+                handleMonthChange();
+            }
+            
+            // Reload the local form data
+            loadMaturityAssessment();
+        }
+
+        // --- 1.6 MATURITY WIZARD LOGIC ---
+        let matCurrentStep = 1;
+        const totalMatSteps = 13;
+
+        function showMaturityScreen(screenId) {
+            document.querySelectorAll('.maturity-screen').forEach(el => el.style.display = 'none');
+            document.getElementById(screenId).style.display = 'block';
+            if (screenId === 'mat_screen_start') {
+                document.getElementById('mat_draft_key').value = '';
+            }
+        }
+
+        function startMaturityWizard() {
+            matCurrentStep = 1;
+            populateMaturityDropdowns();
+            renderMaturityStep();
+            
+            // Default contexts if empty form
+            let cSel = document.getElementById('mat_disp_country');
+            let mSel = document.getElementById('mat_disp_month');
+            if (!activeContext || activeContext === 'Global') {
+                cSel.value = COUNTRIES[0]; 
+            } else {
+                cSel.value = activeContext;
+            }
+            if (document.getElementById('global_month_select').value === 'All_Active') {
+                mSel.selectedIndex = 0;
+            } else {
+                mSel.value = document.getElementById('global_month_select').value;
+            }
+
+            document.getElementById('mat_name').value = '';
+            for (let i = 1; i <= 12; i++) {
+                let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                if (checked) checked.checked = false;
+            }
+
+            // Sync contexts gently down
+            syncMaturityContext();
+            showMaturityScreen('mat_screen_wizard');
+        }
+
+        function renderMaturityStep() {
+            document.querySelectorAll('.wizard-step').forEach(el => el.style.display = 'none');
+            document.getElementById('mat_step_' + matCurrentStep).style.display = 'block';
+            
+            document.getElementById('mat_step_current').innerText = matCurrentStep;
+            
+            let progressPct = (matCurrentStep / totalMatSteps) * 100;
+            document.getElementById('mat_progress_bar').style.width = progressPct + '%';
+
+            // Buttons
+            let btnPrev = document.getElementById('btn_mat_prev');
+            let btnNext = document.getElementById('btn_mat_next');
+            let btnComplete = document.getElementById('btn_mat_complete');
+
+            btnPrev.style.visibility = matCurrentStep === 1 ? 'hidden' : 'visible';
+            
+            if (matCurrentStep === totalMatSteps) {
+                btnNext.style.display = 'none';
+                btnComplete.style.display = 'block';
+            } else {
+                btnNext.style.display = 'block';
+                btnComplete.style.display = 'none';
+            }
+        }
+
+        function nextMaturityStep() {
+            // Validation exactly as requested
+            if (matCurrentStep === 1) {
+                if (!document.getElementById('mat_name').value.trim()) {
+                    alert('Please enter a Respondent Name before proceeding.');
+                    return;
+                }
+            } else {
+                // Questions start at Step 2 (which is Q1)
+                let qNumber = matCurrentStep - 1;
+                let checked = document.querySelector(`input[name="q${qNumber}"]:checked`);
+                if (!checked) {
+                    alert('Please select an answer to continue.');
+                    return;
+                }
+            }
+
+            if (matCurrentStep < totalMatSteps) {
+                matCurrentStep++;
+                renderMaturityStep();
+            }
+        }
+
+        function prevMaturityStep() {
+            if (matCurrentStep > 1) {
+                matCurrentStep--;
+                renderMaturityStep();
+            }
+        }
+
+        function generateDraftKey() {
+            return 'MAT-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        }
+
+        function saveMaturityDraft() {
+            let country = document.getElementById('mat_disp_country').value;
+            let month = document.getElementById('mat_disp_month').value;
+            let respondent = document.getElementById('mat_name').value;
+            
+            let draftState = {
+                step: matCurrentStep,
+                country: country,
+                month: month,
+                respondent: respondent,
+                scores: {}
+            };
+
+            for (let i = 1; i <= 12; i++) {
+                let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                if (checked) draftState.scores[`q${i}`] = parseInt(checked.value);
+            }
+
+            let draftsStr = localStorage.getItem('bi_cost_maturity_drafts');
+            let drafts = draftsStr ? JSON.parse(draftsStr) : {};
+            
+            let key = generateDraftKey();
+            // Don't generate a new key if resuming an old one? Keep it simple: always generate a new unique key for safety.
+            drafts[key] = draftState;
+            localStorage.setItem('bi_cost_maturity_drafts', JSON.stringify(drafts));
+            
+            alert(`Draft Saved Successfully!\n\nYour Recovery Key is: ${key}\n\nPlease save this key. You can use it to resume your assessment later.`);
+            showMaturityScreen('mat_screen_start');
+        }
+
+        function resumeMaturityDraft() {
+            let keyInp = document.getElementById('mat_draft_key').value.trim().toUpperCase();
+            if (!keyInp) {
+                alert("Please enter a Draft Key.");
                 return;
             }
 
-            let respondent = document.getElementById('mat_name').value;
-            let selectedMonth = document.getElementById('global_month_select').value;
+            let draftsStr = localStorage.getItem('bi_cost_maturity_drafts');
+            let drafts = draftsStr ? JSON.parse(draftsStr) : {};
             
-            if (selectedMonth === 'All_Active') {
-                alert("Please select a specific month from the Review Period dropdown to save historical data.");
+            if (!drafts[keyInp]) {
+                alert("Draft Key not found. Please check your key and try again.");
                 return;
             }
+
+            let state = drafts[keyInp];
+
+            // Rehydrate
+            populateMaturityDropdowns();
+            document.getElementById('mat_disp_country').value = state.country || COUNTRIES[0];
+            document.getElementById('mat_disp_month').value = state.month;
+            document.getElementById('mat_name').value = state.respondent || '';
+            
+            for (let i = 1; i <= 12; i++) {
+                let val = state.scores[`q${i}`];
+                if (val) {
+                    let radio = document.querySelector(`input[name="q${i}"][value="${val}"]`);
+                    if (radio) radio.checked = true;
+                } else {
+                    let checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (checked) checked.checked = false;
+                }
+            }
+
+            matCurrentStep = state.step || 1;
+            syncMaturityContext();
+            showMaturityScreen('mat_screen_wizard');
+            renderMaturityStep();
+        }
+
+        // Overwrite standard load (if triggered from switchView)
+        function loadMaturityAssessment() {
+            // Because we changed to a wizard with sub-views, navigating to the tab should just show start screen.
+            populateMaturityDropdowns();
+            showMaturityScreen('mat_screen_start');
+        }
+
+        function completeMaturityAssessment() {
+            // Final validation for Step 13 (Q12)
+            let checked = document.querySelector(`input[name="q12"]:checked`);
+            if (!checked) {
+                alert('Please select an answer to finish.');
+                return;
+            }
+
+            let country = document.getElementById('mat_disp_country').value;
+            let selectedMonth = document.getElementById('mat_disp_month').value;
+            let respondent = document.getElementById('mat_name').value;
 
             let response = {
                 month: selectedMonth,
@@ -1504,14 +1907,15 @@
                 scores: {}
             };
 
+            let totals = { p1: 0, p2: 0, p3: 0 };
             for (let i = 1; i <= 12; i++) {
-                let checked = document.querySelector(`input[name="q${i}"]:checked`);
-                if (!checked) {
-                    alert(`Please answer question Q${i} before saving.`);
-                    return;
-                }
-                response.scores[`q${i}`] = parseInt(checked.value);
+                let chk = document.querySelector(`input[name="q${i}"]:checked`);
+                response.scores[`q${i}`] = parseInt(chk.value);
             }
+
+            totals.p1 = (response.scores.q1 + response.scores.q2 + response.scores.q3 + response.scores.q4) / 4;
+            totals.p2 = (response.scores.q5 + response.scores.q6 + response.scores.q7 + response.scores.q8) / 4;
+            totals.p3 = (response.scores.q9 + response.scores.q10 + response.scores.q11 + response.scores.q12) / 4;
 
             // Save historically
             let histStr = localStorage.getItem(`bi_cost_maturity_history_${country}`);
@@ -1526,14 +1930,12 @@
             
             localStorage.setItem(`bi_cost_maturity_history_${country}`, JSON.stringify(history));
 
-            let btn = document.getElementById('btn_save_maturity');
-            let oldText = btn.innerText;
-            btn.innerText = 'Assessment Saved ✓';
-            btn.style.background = 'var(--chart-1)';
-            setTimeout(() => {
-                btn.innerText = oldText;
-                btn.style.background = 'var(--dhl-red)';
-            }, 2000);
+            // Show Confirmation
+            document.getElementById('mat_res_p1').innerText = totals.p1.toFixed(1);
+            document.getElementById('mat_res_p2').innerText = totals.p2.toFixed(1);
+            document.getElementById('mat_res_p3').innerText = totals.p3.toFixed(1);
+            
+            showMaturityScreen('mat_screen_complete');
             
             if (activeContext === country || activeContext === 'Global') {
                 calcGlobal(); 
@@ -1541,7 +1943,7 @@
         }
 
         function getLatestMaturityScores(targetCountries) {
-            let totals = { p1: 0, p2: 0, p3: 0, count: 0 };
+            let totals = { p1: 0, p2: 0, p3: 0, q1:0, q2:0, q3:0, q4:0, q5:0, q6:0, q7:0, q8:0, q9:0, q10:0, q11:0, q12:0, count: 0 };
             let selectedMonth = document.getElementById('global_month_select').value;
             
             targetCountries.forEach(c => {
@@ -1563,18 +1965,21 @@
                             totals.p1 += (s.q1 + s.q2 + s.q3 + s.q4) / 4;
                             totals.p2 += (s.q5 + s.q6 + s.q7 + s.q8) / 4;
                             totals.p3 += (s.q9 + s.q10 + s.q11 + s.q12) / 4;
+                            for(let i=1; i<=12; i++) totals[`q${i}`] += (s[`q${i}`] || 0);
                             totals.count += 1;
                         }
                     } catch (e) { console.error(e); }
                 }
             });
 
-            if (totals.count === 0) return { p1: 0, p2: 0, p3: 0 };
-            return {
+            if (totals.count === 0) return { p1: 0, p2: 0, p3: 0, q1:0, q2:0, q3:0, q4:0, q5:0, q6:0, q7:0, q8:0, q9:0, q10:0, q11:0, q12:0 };
+            let res = {
                 p1: totals.p1 / totals.count,
                 p2: totals.p2 / totals.count,
                 p3: totals.p3 / totals.count
             };
+            for(let i=1; i<=12; i++) res[`q${i}`] = totals[`q${i}`] / totals.count;
+            return res;
         }
 
         function saveStateToLocal() {
@@ -1800,6 +2205,11 @@
         }
 
         function drawLineChart(id, dataPoints, color) {
+            // Ensure hex color for opacity concatenation
+            if (color === 'var(--dhl-red)') color = '#D40511';
+            if (color === 'var(--chart-1)') color = '#0B8E36';
+            if (color === 'var(--dhl-yellow)') color = '#FFCC00';
+
             let context = clearCanvas(id);
             if (!context) return;
             let { canvas, ctx } = context;
@@ -2032,6 +2442,8 @@
                 document.getElementById('lbl_page_title').innerText = `BI Costing Performance Dashboard`;
             }
 
+            let gStepCosts = { integration: 0, storage: 0, processing: 0, analytics: 0, governance: 0 };
+
             targetCountries.forEach(c => {
                 // Read Trends to build the 24-month chart (never filtered)
                 let trendStr = localStorage.getItem(`bi_cost_trend_${c}`);
@@ -2070,7 +2482,11 @@
 
                 if (activeData) {
                     let subTotal = 0;
-                    STEPS.forEach(s => subTotal += parseFloat(activeData[`eur_${s.id}`]) || 0);
+                    STEPS.forEach(s => {
+                        let val = parseFloat(activeData[`eur_${s.id}`]) || 0;
+                        subTotal += val;
+                        gStepCosts[s.id] += val;
+                    });
 
                     let ships = parseFloat(activeData.shipments) || 0;
                     let users = parseFloat(activeData.users) || 0;
@@ -2093,6 +2509,8 @@
                         let c_dsps = ships > 0 ? (tbSize / ships) : 0;
                         let c_it_pct = itCost > 0 ? (subTotal / itCost) * 100 : 0;
 
+                        let cMatScores = getLatestMaturityScores([c]);
+
                         matrixData.push({
                             label: c,
                             eur_total: subTotal,
@@ -2101,7 +2519,10 @@
                             cps: c_cps,
                             cpu: c_cpu,
                             dsps: c_dsps,
-                            it_pct: c_it_pct
+                            it_pct: c_it_pct,
+                            p1: cMatScores.p1 > 0 ? cMatScores.p1 : null,
+                            p2: cMatScores.p2 > 0 ? cMatScores.p2 : null,
+                            p3: cMatScores.p3 > 0 ? cMatScores.p3 : null
                         });
                     }
                 }
@@ -2116,6 +2537,10 @@
             });
 
             matrixData.forEach(d => {
+                let colorP1 = d.p1 >= 4 ? 'var(--chart-1)' : (d.p1 >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
+                let colorP2 = d.p2 >= 4 ? 'var(--chart-1)' : (d.p2 >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
+                let colorP3 = d.p3 >= 4 ? 'var(--chart-1)' : (d.p3 >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
+
                 matrixHTML += `
                     <tr style="border-bottom: 1px solid var(--border-light);">
                         <td style="padding: 10px; text-align: left; font-weight: 600; color: var(--text-main);">${d.label}</td>
@@ -2126,19 +2551,84 @@
                         <td style="padding: 10px;">${formatEur(d.cpu, 2)}</td>
                         <td style="padding: 10px;">${d.dsps.toFixed(6)} TB</td>
                         <td style="padding: 10px;">${d.it_pct.toFixed(1)}%</td>
+                        <td style="padding: 10px; font-weight: 600; color: ${d.p1 ? colorP1 : 'var(--text-muted)'};">${d.p1 ? d.p1.toFixed(1) : '-'}</td>
+                        <td style="padding: 10px; font-weight: 600; color: ${d.p2 ? colorP2 : 'var(--text-muted)'};">${d.p2 ? d.p2.toFixed(1) : '-'}</td>
+                        <td style="padding: 10px; font-weight: 600; color: ${d.p3 ? colorP3 : 'var(--text-muted)'};">${d.p3 ? d.p3.toFixed(1) : '-'}</td>
                     </tr>
                 `;
             });
 
             document.getElementById('global_matrix_tbody').innerHTML = matrixHTML;
 
+            // 4. Update Country Data Checklist
+            let checklistHtml = '';
+            COUNTRIES.forEach(c => {
+                let hasCost = false;
+                let cTrendStr = localStorage.getItem(`bi_cost_trend_${c}`);
+                if (cTrendStr) {
+                    let cTrend = JSON.parse(cTrendStr);
+                    if (selectedMonth === 'All_Active') {
+                        let stateStr = localStorage.getItem(`bi_cost_state_${c}`);
+                        if (stateStr) hasCost = true;
+                    } else {
+                        if (cTrend.find(r => r.month === selectedMonth)) hasCost = true;
+                    }
+                }
+                
+                let hasMat = false;
+                let mHistStr = localStorage.getItem(`bi_cost_maturity_history_${c}`);
+                if (mHistStr) {
+                    let mHist = JSON.parse(mHistStr);
+                    if (selectedMonth === 'All_Active') {
+                        if (mHist.length > 0) hasMat = true;
+                    } else {
+                        if (mHist.find(h => h.month === selectedMonth)) hasMat = true;
+                    }
+                }
+                
+                let iconCost = hasCost ? '<span style="color:var(--chart-1);">✅</span>' : '<span style="color:var(--dhl-red);">❌</span>';
+                let iconMat  = hasMat  ? '<span style="color:var(--chart-1);">✅</span>' : '<span style="color:var(--dhl-red);">❌</span>';
+                checklistHtml += `
+                    <div style="display:flex; justify-content:space-between; padding:4px; border-bottom:1px solid var(--border-light); font-size:11px;">
+                        <span style="font-weight:600;">${c}</span>
+                        <span>Cost: ${iconCost} &nbsp; Mat: ${iconMat}</span>
+                    </div>
+                `;
+            });
+            let clEl = document.getElementById('glb_country_checklist');
+            if (clEl) clEl.innerHTML = checklistHtml;
+
+            // 5. Update BI Cost Distribution Chart
+            let distBarsHtml = '';
+            let distLegHtml = '';
+            STEPS.forEach((s, idx) => {
+                let val = gStepCosts[s.id];
+                let pct = gTotalCost > 0 ? (val / gTotalCost) * 100 : 0;
+                let color = COLORS[idx % COLORS.length];
+                if (pct > 0) {
+                    distBarsHtml += `<div style="width:${pct}%; background:${color}; height:100%; transition: width 0.3s;" title="${s.label}: ${pct.toFixed(1)}%"></div>`;
+                    distLegHtml += `<div style="display:flex; align-items:center; gap:4px;">
+                        <div style="width:10px;height:10px;background:${color};border-radius:2px;"></div>
+                        <span>${s.label.split(' ')[1]}: <b>${pct.toFixed(1)}%</b></span>
+                    </div>`;
+                }
+            });
+            if (gTotalCost === 0) {
+                distBarsHtml = `<div style="width:100%; background:var(--border-light); height:100%;"></div>`;
+                distLegHtml = `<div style="color:var(--text-muted);">No data available</div>`;
+            }
+            let barsEl = document.getElementById('glb_cost_dist_bars');
+            let legsEl = document.getElementById('glb_cost_dist_legend');
+            if (barsEl) barsEl.innerHTML = distBarsHtml;
+            if (legsEl) legsEl.innerHTML = distLegHtml;
+
             // Calculate Monthly Average Data Change strictly from the 24-month trend aggregation
             let avgDiff = "0.0%";
-            let trendColor = "var(--dhl-red)";
+            let trendColor = "#D40511";
             if (globalTrendData[0] > 0 && globalTrendData[11] > 0) {
                 let change = ((globalTrendData[11] - globalTrendData[0]) / globalTrendData[0]) * 100;
                 avgDiff = (change > 0 ? "+" : "") + change.toFixed(1) + "%";
-                trendColor = change < 0 ? "var(--chart-1)" : "var(--dhl-red)"; // down is good for costs
+                trendColor = change < 0 ? "#0B8E36" : "#D40511"; // down is good for costs
             }
 
             // Update Global KPIs for the Selected Context
@@ -2192,21 +2682,80 @@
             trendKpiEl.innerText = avgDiff;
             trendKpiEl.style.color = trendColor;
 
-            // Draw Global Charts
-            // 1. Bar Chart Sorted
-            if (countryCosts.length > 0) {
-                let sortedCosts = [...countryCosts].map((v, i) => ({ v, label: countryLabels[i] })).sort((a, b) => b.v - a.v);
-                drawBarChart('cvs_global_costs', sortedCosts.map(x => x.label.substring(0, 6) + '.'), sortedCosts.map(x => x.v), COLORS);
-            }
-
-            // 2. Global Trend - Fix: use spread to copy array instead of .reverse() in place
-            drawLineChart('cvs_global_trend', [...globalTrendData], 'var(--dhl-red)');
-
             // 3. Update Maturity Scores
             let matScores = getLatestMaturityScores(targetCountries);
-            document.getElementById('glb_kpi_mat_1').innerHTML = `${matScores.p1.toFixed(1)} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span>`;
-            document.getElementById('glb_kpi_mat_2').innerHTML = `${matScores.p2.toFixed(1)} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span>`;
-            document.getElementById('glb_kpi_mat_3').innerHTML = `${matScores.p3.toFixed(1)} <span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">/ 5.0</span>`;
+            
+            // Maturity KPI Updates
+            let elP1 = document.getElementById('glb_kpi_mat_p1');
+            let elP2 = document.getElementById('glb_kpi_mat_p2');
+            let elP3 = document.getElementById('glb_kpi_mat_p3');
+            if (elP1) {
+                elP1.innerText = matScores.p1 > 0 ? matScores.p1.toFixed(1) : '-';
+                elP1.style.color = matScores.p1 >= 4 ? 'var(--chart-1)' : (matScores.p1 >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
+            }
+            if (elP2) {
+                elP2.innerText = matScores.p2 > 0 ? matScores.p2.toFixed(1) : '-';
+                elP2.style.color = matScores.p2 >= 4 ? 'var(--chart-1)' : (matScores.p2 >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
+            }
+            if (elP3) {
+                elP3.innerText = matScores.p3 > 0 ? matScores.p3.toFixed(1) : '-';
+                elP3.style.color = matScores.p3 >= 4 ? 'var(--chart-1)' : (matScores.p3 >= 2 ? 'var(--dhl-yellow)' : 'var(--dhl-red)');
+            }
+            
+            const qTitles = [
+                "Data Security & Access Control",
+                "Data Architecture & Integration",
+                "Standardized Data Structures & Modeling",
+                "Master & Reference Data Management",
+                "Consistent and Scalable BI Platform",
+                "Unified and Granular Shipment Level Data",
+                "Predictive Analytics (AI/ML-Based Forecasting)",
+                "Prescriptive Analytics (AI-Based Recommendations)",
+                "Structured Performance Reviews with Action Tracking",
+                "Harmonized KPIs & Minimum Control Checks Points",
+                "Multi-Dimensional & Cross-Domain KPI Views",
+                "Hierarchical, Aligned Dashboards"
+            ];
+            
+            const qDesc = [
+                "Role-based access, authorization, audit trails, and encryption...",
+                "Visibility into architecture, structured ETL pipelines...",
+                "Common definitions, consistent schemas, data model alignment...",
+                "Governance and stewardship for core master data...",
+                "A single, governed BI environment enabling standardized dashboards...",
+                "A centralized shipment-level event-based data source...",
+                "Use of AI/ML models to forecast volume, performance deviations...",
+                "AI-driven tools provide actionable recommendations...",
+                "Embedded governance routines with tracked actions...",
+                "QCP, FirstChoice Service Quality, Exceptions, and Billing Accuracy KPI's...",
+                "Dashboards enable cross-sectional analysis with side-by-side benchmarking...",
+                "Role-specific dashboards accessible from operational to executive level..."
+            ];
+
+            for (let i = 1; i <= 12; i++) {
+                let s = matScores[`q${i}`];
+                let rounded = Math.round(s);
+                let color = "#E0E0E0"; // default grey
+                if (rounded === 1) color = "#D40511"; // Red
+                else if (rounded === 2) color = "#F28C28"; // Dark Orange
+                else if (rounded === 3) color = "#FFCC00"; // Yellow
+                else if (rounded === 4) color = "#82C91E"; // Light Green
+                else if (rounded === 5) color = "#0B8E36"; // Dark Green
+                
+                let displayScore = s === 0 ? "-" : Math.round(s).toString();
+
+                try {
+                    document.getElementById(`glb_mat_q${i}`).innerHTML = `
+                        <div class="mat-dash-text">
+                            <div class="mat-dash-title">${qTitles[i-1]}</div>
+                            <div>${qDesc[i-1]}</div>
+                        </div>
+                        <div class="mat-dash-score" style="background: ${s === 0 ? '#E0E0E0' : color};">${displayScore}</div>
+                    `;
+                } catch(e) {
+                    alert("ERROR ON Q" + i + ": " + e.message);
+                }
+            }
         }
 
         // --- INTERACTIVITY FUNCTIONS ---
