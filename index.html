@@ -681,7 +681,7 @@
 
             <div class="grid-4" style="margin-bottom: 24px;">
                 <div class="kpi-card accent-red">
-                    <div class="kpi-label">Total BI Cost</div>
+                    <div class="kpi-label">Monthly BI TCO</div>
                     <div class="kpi-value" id="glb_kpi_total">€0</div>
                     <canvas id="spark_total" class="sparkline"></canvas>
                 </div>
@@ -792,7 +792,7 @@
                 </div>
                 
                 <div class="card" style="height: 380px; display: flex; flex-direction: column;">
-                    <div class="card-header" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px;">Total BI Cost per Country</div>
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 15px;">Monthly BI TCO per Country</div>
                     <div class="kpi-card-body" style="flex: 1; padding: 0 15px 15px 15px; overflow-y: auto;" id="glb_total_cost_chart">
                         <!-- Populated by JS -->
                     </div>
@@ -1583,7 +1583,7 @@
                         <div class="card-header">Average Cost / Shipment <span class="kpi-tag" style="background: var(--bg-body); color: var(--text-muted); padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 10px;">PRIMARY</span></div>
                         <p style="font-size: 13px; margin-bottom: 10px;">North Star metric for shipment delivery efficiency.</p>
                         <div style="background: var(--bg-body); padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px; text-align: center; border: 1px dashed var(--border-light); margin-bottom: 15px;">
-                            (Total BI Cost + FTE) / Monthly Shipments
+                            Monthly BI TCO / Monthly Shipments
                         </div>
                         <h4 style="font-size: 12px; margin-bottom: 5px; color: var(--dhl-red);">Architectural Optimization:</h4>
                         <ul style="font-size: 12px; padding-left: 20px; color: var(--text-muted);">
@@ -1596,7 +1596,7 @@
                         <div class="card-header">Average Cost / User <span class="kpi-tag" style="background: var(--bg-body); color: var(--text-muted); padding: 2px 8px; border-radius: 12px; font-size: 10px; margin-left: 10px;">ADOPTION</span></div>
                         <p style="font-size: 13px; margin-bottom: 10px;">Efficiency of data democratization per active user.</p>
                         <div style="background: var(--bg-body); padding: 10px; border-radius: 6px; font-family: monospace; font-size: 11px; text-align: center; border: 1px dashed var(--border-light); margin-bottom: 15px;">
-                            Total BI Cost / Monthly Active BI Users
+                            Monthly BI TCO / Monthly Active BI Users
                         </div>
                         <h4 style="font-size: 12px; margin-bottom: 5px; color: var(--chart-4);">Architectural Optimization:</h4>
                         <ul style="font-size: 12px; padding-left: 20px; color: var(--text-muted);">
