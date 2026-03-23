@@ -2319,6 +2319,16 @@
                 calcPreview();
             }
 
+            // Auto-seed if data is missing
+            let needsCostingSeed = false;
+            let needsMaturitySeed = false;
+            
+            if (!localStorage.getItem(`bi_cost_trend_${COUNTRIES[0]}`)) needsCostingSeed = true;
+            if (!localStorage.getItem(`bi_cost_maturity_history_${COUNTRIES[0]}`)) needsMaturitySeed = true;
+
+            if (needsCostingSeed) seedMockData(true);
+            if (needsMaturitySeed) seedMockMaturity(true);
+
             // Defaults to Guidance
             document.querySelector('.nav-item[onclick*="v_guidance"]').click();
         }
@@ -3146,7 +3156,7 @@
 
 
         // --- 7. MOCK SEEDING ENGINE ---
-        function seedMockData() {
+        function seedMockData(silent = false) {
 
             let baseShipments = { 'AU': 1200000, 'BNLX': 2500000, 'CBS': 800000, 'CZ': 1500000, 'IN': 3500000, 'PL': 1800000, 'ES': 2200000, 'TH/MY': 1100000, 'TR': 3000000, 'US': 5000000, 'BRS': 500000, 'UK': 4000000 };
 
@@ -3207,7 +3217,7 @@
                 STEPS.forEach(s => snapshot[`eur_${s.id}`] = stateRow[`eur_${s.id}`]);
                 localStorage.setItem(`bi_cost_state_${c}`, JSON.stringify(snapshot));
             });
-            alert("Costing Data successfully seeded.");
+            if (!silent) alert("Costing Data successfully seeded.");
             calcGlobal();
             loadMaturityAssessment();
             if (activeContext !== 'Global') {
@@ -3217,7 +3227,7 @@
             }
         }
 
-        function seedMockMaturity() {
+        function seedMockMaturity(silent = false) {
             
             COUNTRIES.forEach(c => {
                 let history = [];
@@ -3252,7 +3262,7 @@
                 }
                 localStorage.setItem(`bi_cost_maturity_history_${c}`, JSON.stringify(history));
             });
-            alert("Maturity Data successfully seeded.");
+            if (!silent) alert("Maturity Data successfully seeded.");
             calcGlobal();
             loadMaturityAssessment();
             if (activeContext !== 'Global') {
