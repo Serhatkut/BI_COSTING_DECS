@@ -1011,7 +1011,7 @@
                             <button class="btn btn-outline" onclick="exportJson()">Export Global Platform JSON</button>
                             <button class="btn btn-outline" onclick="exportCsv()">Export Active Data to CSV</button>
                             <button class="btn btn-outline" style="border-color: var(--dhl-red); color: var(--dhl-red);"
-                                onclick="localStorage.clear(); seedMockData()">Seed Global Costing Data (V2)</button>
+                                onclick="seedMockData()">Seed Global Costing Data (V2)</button>
                             <button class="btn btn-outline" style="border-color: var(--dhl-yellow); color: #333;"
                                 onclick="seedMockMaturity()">Seed Mock Maturity Data</button>
                         </div>
@@ -3208,7 +3208,13 @@
                 localStorage.setItem(`bi_cost_state_${c}`, JSON.stringify(snapshot));
             });
             alert("Costing Data successfully seeded.");
-            window.location.reload();
+            calcGlobal();
+            loadMaturityAssessment();
+            if (activeContext !== 'Global') {
+                loadStateFromLocal();
+                generateTrendGrid();
+                calcPreview();
+            }
         }
 
         function seedMockMaturity() {
@@ -3247,7 +3253,13 @@
                 localStorage.setItem(`bi_cost_maturity_history_${c}`, JSON.stringify(history));
             });
             alert("Maturity Data successfully seeded.");
-            window.location.reload();
+            calcGlobal();
+            loadMaturityAssessment();
+            if (activeContext !== 'Global') {
+                loadStateFromLocal();
+                generateTrendGrid();
+                calcPreview();
+            }
         }
 
         function drawSparkline(canvasId, dataArr, color, labels = [], unit = '') {
